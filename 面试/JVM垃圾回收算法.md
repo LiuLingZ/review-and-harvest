@@ -106,5 +106,55 @@
 
 ​	缺点：有一部分内存会被浪费。
 
+
+
+
+
+## 三、常用的内存调试工具
+
+### 1、jmap
+
+​		JVM Memory Map命令用于生成heap dump文件，如果不使用这个命令，还可以使用	
+
+​	XX:+HeapDumpOnOutOfMemoryError参数来让虚拟机出现OOM的时候自动生成dump文件。 jmap不仅能生成dump
+
+​	文件，还可以查询finalize执行队列、Java堆和永久代的详细信息，如当前使用率、当前使用的是哪种收集器等。
+
+### 2、jstack
+
+​		jstack是java虚拟机自带的一种堆栈跟踪工具。jstack用于打印出给定的java进程ID或core file或远程调试服务的
+
+​	Java堆栈信息 。
+
+### 3、jconsole
+
+​		Jconsole是JDK自带的监控工具，在JDK/bin目录下可以找到。它用于连接正在运行的本地或者远程的JVM，对
+
+​	运行’在java应用程序的资源消耗和性能进行监控，并画出大量的图表，提供强大的可视化界面。而且本身占用的服务
+
+​	器内存很小，甚至可以说几乎不消耗。
+
+### 4、jstat
+
+​	JVM Statistics Monitoring Tool，是用于监视虚拟机各种运行状态信息的命令行工具，可以显示本地或者远程虚拟机进程中类装载、内存、垃圾收集、JIT编译等运行数据。
+
+### 5、jps
+
+​		JVM Process Status Tool，功能是列出正在运行的虚拟机进程，并显示虚拟机执行主类名称以及这些进程在本
+
+​	地虚拟机唯一ID。
+
+​	
+
+### 6、jhat
+
+​		JVM Heap Analysis Tool，和jmap搭配使用，来分析jmap的堆转存快照。
+
+
+
+
+
+​	
+
 ​		
 
