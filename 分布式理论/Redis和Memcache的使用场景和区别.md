@@ -65,4 +65,4 @@ https://www.jianshu.com/p/0cee8085fc8f
 
 4、当存储的数据不能被剔除时，使用Redis更合适。
 
-5、如果要说内存使用效率，使用简单的key-value存储的话，Memcached的内存利用率更高，而如果Redis采用hash结构来做key-value存储，由于其组合式的压缩，其内存利用率会高于Memcached。当然，这和你的应用场景和数据特性有关。
+5、如果要说内存使用效率，**使用**简单的key-value存储的话，Memcached的内存利用率更高，而如果Redis采用hash结构来做key-value存储，由于其组合式的压缩，其内存利用率会高于Memcached。当然，这和你的应用场景和数据特性有关。
