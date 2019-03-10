@@ -100,6 +100,8 @@ API 用到的3xx状态码，主要是303 See Other，表示参考另一个 URL�
 403 Forbidden（禁止的） 用户通过了身份验证，但是不具有访问资源所需的权限。
 404 Not Found 请求资源不存在或不可用
 405 Method Not Allowed 用户已经通过身份验证，但是所用的 HTTP 方法不在他的权限之内。
+					 通俗地说，就是有相同的uri，但是没有对应的请求类型。如：
+					 有 /user/1  GET ，但是请求的是 DELETE 类型
 410 Gone 所请求的资源已从这个地址转移，不再可用。
 415 Unsupported Media Type：客户端要求的返回格式不支持。比如，API 只能返回 JSON 格
 						  式，但是客户端要求返回 XML 格式。
