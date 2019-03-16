@@ -41,7 +41,7 @@ https://www.cnblogs.com/leesf456/p/5308843.html
 
   并且，先将 c.toArray，其作用主要是在并发修改的时候，一个线程占用c的时间短，并且列表访问快，提高并发效率。
 
-  ​
+  
 
 
 
@@ -58,7 +58,7 @@ https://mp.weixin.qq.com/s/dzNq50zBQ4iDrOAhM4a70A
 - 底层是数组，每个数组元素是一个Entry对象，有key\value\next三个实例，同时也是单向链表的头结点。
 - 链表初始化长默认是16，并且长度必须是2的n次方，每次扩容扩容两倍长
 - 扩容时机： 实际长度 ≥ 负载因子 * 总长 。 负载因子默认0.75，初始化时可修改。
-- 扩容是就会设计到 ReSize 和 ReHash过程。前者是扩容，后者是将元素从旧数组复制到新数组中。
+- 扩容是就会涉及到 ReSize 和 ReHash过程。前者是扩容，后者是将元素从旧数组复制到新数组中。
 - Resize 是先创建两倍长的数组，再从 旧数组Rehash到新的对应位置。
 - HashMap在多线程是不安全的，并发插入元素后可能出现带环的链表，在下次访问时出现死循环。
 
@@ -86,11 +86,11 @@ https://mp.weixin.qq.com/s/1yWSfdz0j-PprGkDgOomhQ
 
   两次hash是为了精确定位到Segment中的位置。
 
-  ​
+  
 
-  ​
+  
 
-  ​
+  
 
 ### 二、JDK1.8
 
