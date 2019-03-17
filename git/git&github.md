@@ -1,4 +1,4 @@
-
+# Git
 
 ### git 结构
 
@@ -203,7 +203,62 @@ me     	       ○ → ○ → ○
 
 
 
+# Github
+
+### 创建远程库地址别名
+
+​	git remote -v 查看当前所有远程地址别名
+
+​	git remote add [别名] [远程地址名] :
+
+​		eg: git remote add origin1 https://gitbub.com/LiuLingZ/xxxx.git
+
+### 推送
+
+​	git push [别名] [分支名]
+
+​		eg : git push origin master
+
+### 克隆
+
+```
+命令 ：git  clone [仓库远程地址]
+
+效果：（3个）
+	完整的把远程库下载到本地
+	初始化了本地（自动 git init → .git）
+	创建origin远程地址别名 git remote -v
+```
 
 
 
+### 团队成员邀请
+
+​	在仓库的settings 点击 Collaboration ，输入被邀请者的 账户，点击Add  collaborator。获得邀请链接 。 通过线下将链接发给被邀请的人。
+
+​	上被邀请的账号，登陆后，复制链接同意即可。
+
+
+
+### 拉取
+
+​	pull = fetch + merge
+
+​	git fetch [远程库地址名] [远程分支名]
+
+​	git merge [远程库地址名] [远程分支名]
+
+​	git pull [远程库地址名] [远程分支名]
+
+### 解决冲突
+
+```
+要点
+ 如果不是基于GitHub 远程库的最新版所做的修改，不能推送，必须先拉取。
+ 拉取下来后如果进入冲突状态，则按照“分支冲突解决”操作解决即可。
+```
+
+
+
+## 跨团队协作
 
