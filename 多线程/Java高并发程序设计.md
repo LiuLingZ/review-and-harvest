@@ -269,6 +269,9 @@ https://www.cnblogs.com/lingz/p/9522616.html
 - CAS问题：
 	ABA问题。即改为A→B又改回A，看起来值相同但是版本不同，可以用版本号解决。
 	未知的等待时长，这也是乐观锁的通病。如果竞争激烈，可能需要循环多次。
+	
+JDK1.8开始一个升级版的AtomicInteger，采用了分段CAS: LongAdder类
+https://mp.weixin.qq.com/s?__biz=MzU0OTk3ODQ3Ng==&mid=2247484070&idx=1&sn=c1d49bce3c9da7fcc7e057d858e21d69&chksm=fba6eaa5ccd163b3a935303f10a54a38f15f3c8364c7c1d489f0b1aa1b2ef293a35c565d2fda&scene=21#wechat_redirect
 
 ```
 

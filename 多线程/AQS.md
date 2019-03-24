@@ -20,7 +20,9 @@ ReentrantLock、ReentrantReadWriteLock都是基于AQS的。
 
 ​	AQS有维护了一个 volatile int state ，标志共享资源，也即锁状态。 以及一个FIFO的先进先出线程等待队列。多线程竞争资源阻塞会被放到这个队列中。
 
-​	status 的修改 基于CAS操作。
+​	state 的修改 基于CAS操作。
+
+​	AQS内部还有一个CLH双向队列，这是个虚拟的双向队列，将每个请求封装为其节点，节点间维护这相互的关系，用来竞争锁。
 
 ​	
 
@@ -31,6 +33,8 @@ ReentrantLock、ReentrantReadWriteLock都是基于AQS的。
 ​	Share（共享，多个线程可同时执行，如Semaphore \ CountDownLatch）
 
 ### 3、 自定义同步器
+
+​	AQS采用的是模板方法模式，意味着，只需修改其模板方法，其他方法不必修改（其实AQS其他方法都是final也修改不了），就可以提供新的功能，而AQS的模板方法就是下面那几个
 
 ​	自定义同步器只需要去自定义 共享变量state 的获取、释放行为即可，其他的AQS已经实现。
 
@@ -59,4 +63,4 @@ ReentrantLock、ReentrantReadWriteLock都是基于AQS的。
 
 ## 总结
 
-​	**AQS就是一个并发包的基础组件，用来实现各种锁，各种同步组件的。**它包含了state变量、加锁线程、等待队列等并发中的核心组件。
+​	**AQS就是一个并发包的基础组件，用来实现各种锁，各种同步组件的。**它包含了state变量、加锁线程、虚拟等待队列等并发中的核心组件。
