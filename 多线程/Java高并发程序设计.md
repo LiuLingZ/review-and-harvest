@@ -304,23 +304,144 @@ https://mp.weixin.qq.com/s?__biz=MzU0OTk3ODQ3Ng==&mid=2247484070&idx=1&sn=c1d49b
 
 
 
+## 线程同步
+
+https://www.cnblogs.com/paddix/p/5381958.html 
+
+### wait / notify
+
+```
+- 属于Object的native方法，可以直接调用
+- 依赖同步锁，他们需要出现在同步代码中，依附于这个同步方法的同步监视器上。
+- wait 释放锁并释放资源
+```
+
+
+
+### sleep
+
+```
+- Thread类的静态方法
+- 不会释放锁，仅仅只是释放CPU资源 ； sleep一直持有同步监视器
+```
+
+
+
+### yield
+
+```
+- Thread的静态方法
+- 目的是让当前线程从 Running 状态 → Runnable ，让出资源给其他线程
+- yield之后线程可以重新竞争锁，但是不能保证一定竞争得到。
+```
+
+
+
+### join
+
+```
+- 调用此方法的线程将进入执行，而外层的这个线程将等待此线程执行完才能执行，当然可以设定时间
+- 比如A线程中，调用了B.join() ， 则A线程必须等B执行完后才能执行.
+```
+
+
+
+### sleep 和 wait区别
+
+```
+- 一个是Thread , 一个是Object
+- sleep释放cpu但是不释放锁， wait全部释放
+- sleep
+```
+
+
+
+**如果线程A希望立即结束线程B，则可以对线程B对应的Thread实例调用interrupt方法。如果此刻线程B正在wait/sleep/join，则线程B会立刻抛出InterruptedException，在catch() {} 中直接return即可安全地结束线程。**
+
+**需要注意的是，InterruptedException是线程自己从内部抛出的，并不是interrupt()方法抛出的。对某一线程调用interrupt()时，如果该线程正在执行普通的代码，那么该线程根本就不会抛出InterruptedException。但是，一旦该线程进入到wait()/sleep()/join()后，就会立刻抛出InterruptedException。**
+
+
+
+**waite()和notify()因为会对对象的“锁标志”进行操作，所以它们必须在synchronized函数或synchronized block中进行调用。如果在non-synchronized函数或non-synchronizedblock中进行调用，虽然能编译通过，但在运行时会发生illegalMonitorStateException的异常。**
+
+
+
+## 停止线程的方式
+
+https://www.cnblogs.com/greta/p/5624839.html
+
+### 一、通过异常+return
+
+​	此时线程可能 sleep() \ join() \ wait()  ，那么这时，直接调用线程的 interrupt() ，线程会产生一个 InterruptedException，捕获，然后return 即可。
+
+​	运行过程调用interrupt（）不会强制终止线程，只是标了终止记号后，线程再自己不定期停止线程。
+
+
+
+### 二、暴力停止
+
+​	stop（）方法，但是可能出现死锁。
 
 
 
 
 
+## 关于死锁
+
+### 1、死锁小demo
+
+```java
+public class DeathLockDemo{
+    public void method1() throws InterruptedException{
+        synchronized (String.class){
+            Thread.sleep(1000);
+            synchronized (Integer.class){}
+        }
+    }
+    public void method2() throws InterruptedException{
+        synchronized (Integer.class){
+            Thread.sleep(100);
+            synchronized (String.class){}
+        }
+    }
+    public static void main(String[] args){
+        final DeathLockDemo deathLockDemo = new DeathLockDemo() ;
+        Thread thread1 = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    deathLockDemo.method1();
+                    deathLockDemo.method2();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread thread2 = new Thread(){
+            @Override
+            public void run() {
+                try {
+                    deathLockDemo.method2();
+                    deathLockDemo.method1();
+                }catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread1.start();
+        thread2.start();
+    }
+}
+
+```
 
 
 
+### 2、产生死锁的原因
 
 
 
-
-
-
-
-
-
+### 3、 如何解决死锁
 
 
 
