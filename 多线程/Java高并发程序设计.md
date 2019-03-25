@@ -172,7 +172,7 @@
 
 ```
 - 作用和suspend\resume是一样的，不同的是，更安全，不会发生死锁
-- park() 、 unpark() 两个方法
+- park() 、 unpark(Thread thread) 两个方法
 - 底层是通过信号量实现，park消耗信号量，变为不可用，unpark则将信号量变为可用，提供消费。信号量只有一个，不会增加，所以，即使unpark发生在park之前，也会被park消耗掉，不会死锁。（park是在unpark之前的，因为逻辑上，只有park阻塞了，才会有unpark解锁，才有锁的意义，否则都不需要了）
 ```
 
@@ -233,15 +233,13 @@
 ##ThreadLocal 人手一支笔
 
 ```
-- 为每一个线程都准备一个变量，而不是都去竞争一个变量
-
-原理：
-- 底层是一个ThreadLocalMap，相当于HashMap，每个线程一个ThreadLocalMap，用来存储属于该线程的变量。
-
-问题：
-- 每个线程都拥有一份拷贝，自然就不用竞争，效率提高
-- 容易存在内存泄漏的问题，如果存储的都是大对象，然而线程是由线程池产生的话，总有保留一些线程存活，这些备份的 
-  对象都不被GC，但也没被用到， 导致内存泄漏，还需显示的 ThreadLocal.remove()释放掉好。 
+剖析发现：
+	Thread类含一个ThreadLocalMap的对象threadLocals，这个ThreadLocalMap是ThreadLocal的内部类。通过ThreadLocal创建的副本是存储在每个线程自己的threadLocals中的。
+	是以ThreadLocal作为键，副本作为值。
+	为什么要ThreadLocal作为键？因为每个线程都可以有多个ThreadLocal对象。
+	
+使用场景：
+	想数据库的connection、Session管理（从工厂拿Session）等。
 
 ```
 

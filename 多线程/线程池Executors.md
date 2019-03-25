@@ -1,4 +1,4 @@
-项目例子：IDEA：IDEAProject\JavaSE\javaBasics\src\main\java\com\lingz\Thread\threadPool
+​       4项目例子：IDEA：IDEAProject\JavaSE\javaBasics\src\main\java\com\lingz\Thread\threadPool
 
 # 线程池
 
@@ -37,7 +37,7 @@ public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) 
 
 ## 二、线程池内部实现
 
-### 1、new ThreadPoolExecutor构造器
+### 1、newThreadPoolExecutor构造器
 
 ```java
 public ThreadPoolExecutor(
@@ -116,7 +116,7 @@ JDK内置四种拒绝策略：
                     @Override
                     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
                         System.out.println(r.toString() + " is discard");
-                    }
+                    }  
                 });
 ```
 
