@@ -51,6 +51,8 @@ https://www.cnblogs.com/leesf456/p/5308843.html
 
 #### HashMap
 
+详细介绍： https://mp.weixin.qq.com/s/dzNq50zBQ4iDrOAhM4a70A
+
 https://mp.weixin.qq.com/s/KCxKKeJ28Yev5xsv4WzRog
 
 https://mp.weixin.qq.com/s/dzNq50zBQ4iDrOAhM4a70A
@@ -167,6 +169,89 @@ http://www.codeceo.com/article/java-hashmap-concurrenthashmap.html
 
 
 
+
+# 关于Map
+
+https://www.cnblogs.com/xiaoming0601/p/5864106.html
+
+
+
+## 1、HashMap当key为null时的处理：
+
+```
+JDK1.6
+	如果key为null，直接遍历第一个桶，看有没有key为null的键值，有就覆盖替换，无就作为头节点存放。
+JDK1.8
+	如果key==null，就将其hashcode置为 0 ,再进行普通key的定位、存放。
+```
+
+注:
+
+```
+HashMap可以接受key为null ，而 HashTableb不可，因为，HashTable是需要用到equals的
+HashTable就是直接在get \ put方法加 synchronized，效率低的。
+```
+
+## 2 、减少hash碰撞
+
+​	尽量让不同对象产生不同的hashcode， 并且较为均匀地散列在数组上，减少链表的长度。
+
+​	使用不可变类如String 、 Integer作为key的好处：自身重写了equals和hashCode方法，类不可变保证每次获取的hashcode都是一样的，确保存储的key是一致的。
+
+
+
+##3 、为什么使用红黑树而不是二叉搜索树、B+树
+
+```
+二叉搜索树：
+	- 若有左子树，则左子树的节点的任何值都小于等于根节点；若有右子树，也是如此
+	- 一些极端情况下，二叉搜索树可能退化成普通的链表
+
+红黑树：
+	根节点黑色
+	子节点可为红色或黑色
+	红节点的子节点必须是黑色，这意味着两个红色节点不会相邻
+	插入数据需要旋转、变色等等。
+	黑色节点都是null
+	叶子节点都是黑色节点
+	从根节点到每个叶子节点，所经路径上的黑色节点数是一样多的。
+	
+B+树：
+	相对而言，B+树就有个问题了，所有因为B+树存储过多的冗余数据，子节点存了父节点的值，这是没必要的。
+	
+	
+所以，使用红黑树，搜索的时间复杂度就变为O（logN），即树的深度。
+
+```
+
+
+
+
+
+## 4、HashTable vs ConcurrentHashMap
+
+```
+- HashTable 是线程安全的，put\get直接加synchronized实现，效率较低
+- HashTable不允许 key为null ，因为她需要用到 equals方法比较key
+- HashTable初始长度为11，负载因子0.75 ， 扩容是2*capacity + 1 （因为可能是质数）
+- 建议初始化长度为质数，，因为！！HashTable确定位置是通过 hashcode对长度取模，而对质数取模可以完整均匀地分布在长度中。
+
+
+两者比较：
+- 两者都是通过加锁保证线程安全，但是加锁程度不同
+- ConcurrentHashMap采用局部加锁的特点，1.7对某个Segment分段加锁 ； 1.8开始在链表（红黑树）中采用CAS修改，不行再加synchronized。1.8的变量都是volatile修饰，保证可见性。
+- 虽然插入数据，红黑树需要变色、旋转等调整策略，但是和搜索效率比起来还是可以接受的
+
+
+CAS：
+	特点：比较-交换，乐观锁的实现
+	缺点：ABA问题，失败重试带来的延时
+
+
+
+
+
+```
 
 
 
