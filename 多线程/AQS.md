@@ -40,27 +40,24 @@ ReentrantLock、ReentrantReadWriteLock都是基于AQS的。
 
 ​	自定义同步器 实现事主要有一下几种方法：	
 
-		isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
-		tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败则返回false。
-		tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败则返回false。
-		tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩						    余可用资源；正数表示成功，且有剩余资源。
-		tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返						   回true，否则返回false。
-	
-		上面这几种方式就是 独占的、共享的锁的实现方式。
+```java
+	isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
+	boolean tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败则返回false。
+	boolean tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败则返回false。
+	int tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩						    余可用资源；正数表示成功，且有剩余资源。
+	int tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返						   回true，否则返回false。
 
-
-
-
-​	 
-
-
-
-
-
-
+	上面这几种方式就是 独占的、共享的锁的实现方式。
+```
 
 
 
 ## 总结
 
 ​	**AQS就是一个并发包的基础组件，用来实现各种锁，各种同步组件的。**它包含了state变量、加锁线程、虚拟等待队列等并发中的核心组件。
+
+​	通过AQS实现的同步功能，只需要自定义对state的修改规则，其他的入队、出队什么的细节，AQS都已经封装好，不需要再实现。
+
+​	同步类在实现一般就是自定义一个同步器（sync）继承AQS作为内部类，供自己使用。
+
+​	AQS底层也是主要靠CAS实现的。
