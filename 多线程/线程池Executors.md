@@ -1,4 +1,12 @@
-​       4项目例子：IDEA：IDEAProject\JavaSE\javaBasics\src\main\java\com\lingz\Thread\threadPool
+       4项目例子：IDEA：IDEAProject\JavaSE\javaBasics\src\main\java\com\lingz\Thread\threadPool
+
+参考：
+
+http://www.cnblogs.com/dolphin0520/p/3932921.html
+
+Java高并发程序设计
+
+
 
 # 线程池
 
@@ -123,6 +131,25 @@ JDK内置四种拒绝策略：
 
 
 
+
+### 5、线程池的状态
+
+​	**volatile int runStatue ;**
+
+```
+static final int RUNNING = 0 ; //线程池初始化后的状态
+static final int SHUTDOWN = 1 ; //调用shutdown()
+static final int STOP = 2 ; //调用了shutdownNow()
+static final int TEMINATED = 3 ; //终止状态。
+```
+
+
+
+### 6、停止线程池
+
+shutdown() ：不会立即终止线程池，而是等所有等待中的任务运行完后停止，期间拒绝新任务
+
+shutdownNow()：立即停止线程池，并且尝试中断正在执行的线程，期间拒绝新任务，清空缓存队列。返回未执行的任务。
 
 
 
