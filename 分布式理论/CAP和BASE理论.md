@@ -2,7 +2,7 @@ http://www.ruanyifeng.com/blog/2018/07/cap.html
 
 https://www.cnblogs.com/szlbm/p/5588543.html
 
-# CAP和BASE理论
+# CAP和BASE理论	
 
 **问题的提出**
 
