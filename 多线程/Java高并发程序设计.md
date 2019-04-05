@@ -34,11 +34,32 @@
 
 #### 64位的long在并发读写是不安全的
 
-#### happen-before原则：
+#### happen-before原则/先行发生原则
 
 ​	不能发生指令重排序的情况
 
-#### 
+```
+程序次序规则：
+	在单线程中，程序的执行结果和代码块的顺序执行的结果是一样的。即可以理解单线程中上一句的代码应该在下一句代	码执行前执行。
+管程锁定规则
+	对同一个锁，上一个加锁的unlock先于下一个加锁的lock
+volatile变量规则
+	同一时间，对volatile的写操作先于volatile的读操作
+线程启动规则
+	一个线程的start优先于线程执行中的每一个动作
+线程终止规则
+	线程中的所有操作都先于发生于线程的终止检测
+线程中断规则
+	对线程的interrupt()调用优先发生于被中断线程的代码检测到中断事件的发生。
+对象终结规则
+	一个对象的初始化（<clinit>()）优先于对象finalize()的调用
+传递性
+	A先于B，B先于C，则A先于C
+```
+
+
+
+####
 
 #### Thread.stop（）和 Thread.interrupt()
 
@@ -456,6 +477,73 @@ public class DeathLockDemo{
 	- 信号量数量不止一个，所以允许多个规定数目的线程访问统一资源。是有数量限制的互斥量。
 事件
 	- 通过通知的方式保证线程同步，还可以方便对多个线程的优先级进行比较操作。
+```
+
+
+
+## 线程状态
+
+```
+New、 Runnable、 Running、 Wait、Blocked 、Terminated
+```
+
+### 1、Wait 和 Blocked区别
+
+```
+wait : 指当线程遇到wait、sleep、join方法时发生,wait状态指的是线程让出资源，等待另外的线程执行。可等待有  		限、无限时间、唤醒动作唤醒后醒来。
+blocked : 指当线程等待同步监视器时所处状态，可以理解为等待monitor的状态，获取不到，一直blocked,如获取锁、		在等待进入同步代码块时，会进入blocked状态。
+```
+
+### 2、生产者消费者
+
+```java
+/**     
+    * 生产者生产出来的产品交给店员     
+    */    
+    public synchronized void produce()    
+    {
+        if(this.product >= MAX_PRODUCT)
+        { 
+            try 
+            {
+                wait(); 
+                System.out.println("产品已满,请稍候再生产");
+            }
+            catch(InterruptedException e) 
+            {
+                e.printStackTrace () ; 
+            } 
+            return; 
+        } 
+
+        this.product++;
+        System.out.println("生产者生产第" + this.product + "个产品.");
+        notifyAll();   //通知等待区的消费者可以取出产品了
+    }
+  
+    /**      
+     * 消费者从店员取产品
+    */    
+    public synchronized void consume()     
+    {        
+        if(this.product <= MIN_PRODUCT)        
+        {           
+            try              
+            {                
+                wait(); 
+                System.out.println("缺货,稍候再取");
+            }              
+            catch (InterruptedException e)              
+            {                 
+                e.printStackTrace();             
+            }            
+            return;
+        }                  
+        
+            System.out.println("消费者取走了第" + this.product + "个产品.");
+            this.product--;
+            notifyAll();   //通知等待去的生产者可以生产产品了
+    }
 ```
 
 
