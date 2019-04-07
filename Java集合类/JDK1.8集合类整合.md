@@ -1,10 +1,6 @@
 #总概
 
-
-
-
-
-
+![img](https://images2015.cnblogs.com/blog/249993/201611/249993-20161122113410534-705560500.jpg)
 
 ## 1、ArrayList
 
@@ -27,7 +23,17 @@ ArrayList有其特殊的应用场景，与LinkedList相对应。其优点是随�
 
 
 
-##2、LinkedList
+## 2、Vector
+
+https://www.cnblogs.com/zhangzongle/p/5432212.html
+
+- 底层是一个Object[] elementData 数组，和ArrayList一样，随机访问快，删除慢，需要移动元素
+- 默认大小是10，可指定大小。每次扩容是2倍扩容
+- 有个capacityIncrement ， 可以在初始化时指定，指定后，每次扩容都是扩 capacityIncrement 
+
+
+
+##3、LinkedList
 
 https://www.cnblogs.com/leesf456/p/5308843.html
 
@@ -45,7 +51,7 @@ https://www.cnblogs.com/leesf456/p/5308843.html
 
 
 
-## 3、HashMap
+## 4、HashMap
 
 ### 一、JDK1.7
 
