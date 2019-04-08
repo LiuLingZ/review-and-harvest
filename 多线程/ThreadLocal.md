@@ -24,6 +24,28 @@ https://mp.weixin.qq.com/s/IJt-oYl5DVJIlc8uYwLj2w
 
 ​	类似map，但不是map，只是概念上是Map，节点是一个个Entry实例，包含key \ value \ 前一个节点 \ 后一个节点 ，这样形成的是个环，大小是2的幂 ， 采用的是线性探测法来避免冲突。
 
+```java
+ThreadLocalMap含有一个Entry类型的数组， Entry[] ， 查看这个Entry，是实现了WeakReferance的类
+翻看 Entry :
+	static class Entry extends WeakReference<ThreadLocal<?>> {
+            /** The value associated with this ThreadLocal. */
+            Object value;
+
+            Entry(ThreadLocal<?> k, Object v) {
+                super(k);
+                value = v;
+            }
+        }
+从这个 super(k) ，进入看源码，可以看到，最终，引用ThreadLocal的弱引用被作为key
+这就解释了，为什么key被回收后，value还活着，因为是entry的一个字段（key）被回收，而不是整个entry！！！！
+所以：
+	Thread → ThreadLocalMap → Entry[] → entry.object 是一个强可达的。 
+```
+
+
+
+
+
 
 
 ## 2、弱引用和内存泄漏
