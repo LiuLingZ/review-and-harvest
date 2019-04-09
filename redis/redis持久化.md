@@ -1,5 +1,9 @@
 https://www.cnblogs.com/itdragon/p/7906481.html
 
+
+
+是什么 → 什么时候触发 → 过程 → 优点/适用时机 → 
+
 # redis 持久化
 
 ​	即将内存中的数据保存到磁盘中，在redis的体现就是 AOF （Append Only File）和 RDB ( Redis Database)
@@ -10,15 +14,14 @@ https://www.cnblogs.com/itdragon/p/7906481.html
 
 ## RDB（Redis Database）
 
-### 0、原理
 
-​	进行rdb持久化时，redis的原进程fork一份与原进程一模一样的子进程进行持久化操作，子进程先将数据写到一个临时文件，待持久化结束，再替代上一个持久化的文件。这期间原进程不进行任何IO操作，为的就是高效地进行持久化操作。对于大数据量的恢复以及对数据完整性不是非常敏感，RDB比AOF适用，但是RDB的缺点也是，可能丢失最后一次持久化数据（持久化中断失败。）
 
 ###1、使用save，bgsave指令立刻保存到dump.rdb中
 
-- save 是立刻保存，不管其他，全部阻塞
-- bgsave 后台异步进行快照操作，还可响应客户端请求
+- save 是立刻保存，不管其他，全部阻塞，不建议使用
+- bgsave 后台异步进行快照操作，还可响应客户端请求，后台fork一个进程，这个过程是阻塞的
 - flushall 也会立刻保存，但是清空，没意义
+- shutdown也会触发bgsave
 
 ### 2、通过dump.rdb恢复
 
@@ -37,26 +40,72 @@ https://www.cnblogs.com/itdragon/p/7906481.html
 ### 4、一些参数
 
 - stop-writes-on-bgsave-error yes 保存过程发生异常停止写操作
-- rdbcompression yes 保存后的rdb文件进行LZF压缩算法压缩，会略微消耗cpu，但是如果不压缩日志文件很大
+- **rdbcompression yes 保存后的rdb文件进行LZF压缩算法压缩，会略微消耗cpu，但是如果不压缩日志文件很大**
 - rdbchecksum yes 压缩后进行数据校验，会占用10％性能，默认开
 - dbfilename dump.rdb 压缩文件名
 - dir ./ 保存rdb文件的位置
 
 ### 5、优势
 
-- 适合大规模的数据恢复
-- 对数据的完整性和一致性要求不高（因为是隔一段时间保存，有可能突然中断，一段时间内的数据消失）
+- 适合大规模的数据恢复，建议隔一段时间就bgsave
+- 恢复速度比AOF快
 
 ### 6、劣势
 
-- 保存的完整性和一致性不高
-- 直接的冷拷贝，导致2倍的备份文件大小
+- 没办法做到实时持久化/秒级持久化，存的也只是fork前的内容，势必会丢失数据
+- RDB采用特定二进制保存，Redis演化了多个格式RDB，老版本Redis无法兼容新版本Redis的RDB
+
+### 7、过程
+
+```
+bgsave
+↓
+父进程判断是否正在执行RDB备份， 是则直接返回
+↓
+否，则fork一个子进程，去生成RDB文件。父进程就去接着响应 。fork过程会阻塞父进程。
+↓
+RDB文件根据当前父进程的内存生成临时快照文件，完成后对原有的dump.rdb进行原子替换。
+↓
+子进程完成后通知父进程，父进程再去记录一些RDB备份信息（时间、次数等）
+
+```
+
+
+
+
+
+
 
 
 
 ## AOF(Append Only File)
 
-​	默认不开启，修改 appendonly yes 打开。为了弥补RDB最后一次持久化可能出现的失败导致较多的数据丢失的缺点。
+​	默认不开启，修改 appendonly yes 打开。为了弥补RDB最后一次持久化可能出现的失败导致较多的数据丢失的缺点。提供实时/秒级持久化的功能。
+
+​	aof内容是文本格式，记录的是数据的写入修改操作。恢复时重新执行一遍，相比RDB比较耗时。
+
+​	重启时有AOF先AOF。
+
+### 0、过程
+
+```
+AOF流程：文件写入(append) 、文件同步（sync）、文件重写（rewrite）、重新加载（load）
+
+持久化过程：
+append （注意！！！是append到 aof_buf 缓存文件中，因为每次写到AOF，是在磁盘上，效率低；并且缓冲区可控，可以在性能和安全上做权衡）
+↓
+sync(存到磁盘，根据所选策略不同，这一步的时机也不同)
+↓
+load（更新完成后，重新加载AOF）
+
+根据appendfsync策略的不同，期间sync执行的时机也不同
+
+关于 fsync :
+	就是将 aof_buf 的内容写到 appendonly.aof 文件中，真正的持久化
+
+```
+
+
 
 ### 1、 指定更新条件
 
@@ -64,14 +113,25 @@ https://www.cnblogs.com/itdragon/p/7906481.html
 # appendfsync always
 appendfsync everysec
 # appendfsync no
+
+always : 每次append到aof_buf时，都调用fsync，同步到aof文件中
+everysec ： append到 aof_buf中，每隔1s就调用一次 fsync .理论丢失1s数据，突然宕机的话。
+no : 写入到aof_buf中后，调用系统的write,让系统去决定什么时候 同步到aof中，通常同步周期30s
+
+write ： 触发延迟写 机制，将aof_buf的内容写到系统缓冲区中，当满了或者一段时间后，再写入aof文件中。
+
 ```
 
 always :同步持久化，每次数据变化都会立刻写入磁盘，性能较差但是数据完整性好。
 
+no：同步周期不可控，虽提升性能，但安全性也降低了。
+
+
+
 ### 2、配置 重写 触发机制
 
-auto-aof-rewrite-percentage 100
-auto-aof-rewrite-min-size 64mb
+auto-aof-rewrite-percentage 100   # 是上一次的一倍
+auto-aof-rewrite-min-size 64mb	# 文件大小超过64M
 
 当AOF文件大小是上次rewrite后大小的一倍（100％）且文件大于64M时触发。一般都设置为3G，64M太小了。
 
@@ -81,9 +141,35 @@ auto-aof-rewrite-min-size 64mb
 
 ​	AOF文件是通过记录修改来进行持久化，如此日积月累占用内存大。所以redis提供重写机制，当.aof文件到达一个阈值，redis就会对aof文件的内容压缩。
 
-​	重写原理：fork一个新的进程，读取内存的内容（不是读取旧文件的，太大），重写写到一个临时文件，最后替换掉原来的旧aof文件。
+​	
 
-​	触发机制：当AOF文件大小是上次rewrite后大小的一倍且文件大于64M时触发。这里的“一倍”和“64M” 可以通过配置文件修改。
+```
+触发机制：
+	当AOF文件大小是上次rewrite后大小的一倍且文件大于64M时触发。这里的“一倍”和“64M” 可以通过配置文件修改。
+
+手动触发：bgrewriteaof
+自动触发：根据auto-aof-rewrite-xx参数
+
+过程：
+	bgrewriteaof
+		↓
+	fork一个父进程，此过程阻塞，但速度快
+		↓
+	fork后，父进程继续处理请求，但是此时，父进程分两路保存：
+		1、继续写到 aof_buf中，并根据策略，fsync到 旧 的aof文件中
+		2、写到一个 aof_rewrite_buf中，这个缓冲区，是在新的aof取代就aof时，父进程还需要响应，先写到这
+		↓
+	当子进程重写完后通知父进程，替换旧的aof，按后再和aof_rewritwe_buf整合，得到最新的
+		↓
+	重启，重新load
+
+
+
+父接收写 aof_buf同步到 旧aof，子rewrite
+子告诉父，用新aof取代旧aof，这个过程父还在响应
+取代后，整合 aof_rewrite_buf 和 新aof，形成最终版
+
+```
 
 
 
@@ -94,6 +180,10 @@ auto-aof-rewrite-min-size 64mb
 缺点：AOF记录的数据多，文件也会越来越大，数据恢复慢
 
 
+
+### 5、文件校验
+
+加载坏的aof 会拒绝启动，可以用 redis-check-aof --fix 修复，RDB也可以 redis-check-rdb --fix 
 
 
 
