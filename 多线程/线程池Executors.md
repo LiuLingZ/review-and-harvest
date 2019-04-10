@@ -64,7 +64,7 @@ public ThreadPoolExecutor(
 ```
 ① 提交一个线程任务到线程池，首先比较 corePoolSize 是否还有剩余，有，则分配线程，执行。
 ② 如果无，则判断 阻塞队列 workQueue是否已经满了，没有，则加入队列中等候；满了，进入第③步。
-③ 比较maximum，看是否已经达到最大，如果没有，则开辟一个新的线程，取队列首的任务进行，新的任务加入到队列中。
+③ 比较maximum，看是否已经达到最大，如果没有，则开辟一个新的线程，直接去执行任务。
 ④ 若workQueue已满，则调用拒绝策略进行处理。
 ⑤ 由拒绝策略决定新加入的任务的去留问题。
 ```
@@ -150,6 +150,20 @@ static final int TEMINATED = 3 ; //终止状态。
 shutdown() ：不会立即终止线程池，而是等所有等待中的任务运行完后停止，期间拒绝新任务
 
 shutdownNow()：立即停止线程池，并且尝试中断正在执行的线程，期间拒绝新任务，清空缓存队列。返回未执行的任务。
+
+
+
+### 7、关于submit() 和 execute()
+
+```
+execute() ：
+	Executor声明的方法，在ThreadPoolExecutor提供了具体实现，是ThreadPoolExecutor的核心方法，作用是提交一个任务给线程池去执行。
+	
+	
+submit() :
+	在ExecutorService中声明的方法，在它的实现类 AbstractExecutorService 提供了实现 ， 它的作用和execute()差别不大，都是提交一个任务给线程池执行。不同的是，他能接收返回结果。
+	submit()底层还是调用execute()，并且通过Future去执行线程。
+```
 
 
 
