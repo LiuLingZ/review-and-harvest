@@ -2,6 +2,8 @@
 
 ![img](https://images2015.cnblogs.com/blog/249993/201611/249993-20161122113410534-705560500.jpg)
 
+![img](https://pic002.cnblogs.com/images/2012/80896/2012053020261738.gif)
+
 ## 1、ArrayList
 
 https://www.cnblogs.com/leesf456/p/5308358.html
@@ -21,7 +23,7 @@ https://www.cnblogs.com/leesf456/p/5308358.html
 
 ArrayList有其特殊的应用场景，与LinkedList相对应。其优点是随机读取，缺点是插入元素时需要移动大量元素，效率不太高。
 
-
+ 
 
 ## 2、Vector
 
