@@ -35,6 +35,24 @@ https://www.cnblogs.com/zhangzongle/p/5432212.html
 
 
 
+## 3、CopyOnWriteArrayList
+
+https://www.cnblogs.com/dolphin0520/p/3938914.html
+
+**写时复制**；一种并发安全的ArrayList，其思想是：写的时候复制一份新的数组出来，在新的里面修改，修改完后，再用原来的引用去引用这个新的数组。这个过程中，读还是读原来的数组。
+
+- 其add()方法是先加锁，再进行复制、新增的功能。加锁时为了防止并发copy出多个副本。
+- 写时复制，适合读多写少的情况。比如黑名单、白名单。
+- 写时复制的缺点：内存占用问题 ； 数据一致性问题。
+
+内存占用：写的时候复制一份一模一样的大小的，在一个时间段内存驻留两个大对象，容易造成GC。
+
+数据一致性：写的过程是复制，写；这个过程无法读到新的数据，所以要求立刻读到新的数据时，不要用CopyOnWriteArrayList。
+
+
+
+
+
 ##3、LinkedList
 
 https://www.cnblogs.com/leesf456/p/5308843.html
