@@ -15,7 +15,7 @@ Java高并发程序设计
 ###1、JDK提供一套Executor框架，其中：
 
 ```java
-Executors ：它扮演一个线程池工厂的角色。可以通过其获得特点功能的线程池（ThreadPoolExecutor）、
+Executors ：它扮演一个线程池工厂的角色。可以通过其获得特定功能的线程池（ThreadPoolExecutor）、
 		   ThreadFactory(线程工厂)。 
 ThreadPoolExecutor : 表示一个线程池 ，可以通过new构造一个自己的线程池 。
 ```
@@ -35,8 +35,7 @@ public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) 
 ```java
 内容：返回的ScheduledExecutorService可以根据时间需要对线程进行调度。
 含主要方法：
-	public ScheduledFuture<?> scheduledAtFixedRate(Runnable,long initialDelay,long period,TimeUnit 
-	unit);
+	public ScheduledFuture<?> scheduledAtFixedRate(Runnable,long initialDelay,long period,TimeUnit unit);
 			//按固定的延迟速率，第一个任务一开始，就计算延迟时间，到了就开始下一个
 	public ScheduledFuture<?> scheduledWithFixedDelay(Runnable,long initialDelay,long 				period,TimeUnit unit) ;	//按固定延迟时段。上一个任务结束后，才开始计时延迟，到了才开始下一个任务。
 ```
@@ -77,18 +76,19 @@ public ThreadPoolExecutor(
 作用：用于存储提交的，但是未被执行的任务的任务队列，是一个BlockingQueue接口类型的对象。
 ThreadPoolExecutor可以使用:
 	- 直接提交队列
-		SynchronousQueue,特殊的BQ，没有容量，一个任务的提交需要被立刻执行，没有空闲就创建线程，一旦达到最		  大值，就执行拒绝策略RejectedExecutorHandler。此时，需要设置很大的maximum，否则很容易拒绝。
-		Executors.newCachedThreadPool就是采用这种任务队列。不保留，直接开线程去执行任务。
+		SynchronousQueue,特殊的BQ，没有容量，一个任务的提交需要被立刻执行，没有空闲就创建线程，一旦达		到最大值，就执行拒绝策略RejectedExecutorHandler。此时，需要设置很大的maximum，否则很容易拒
+		绝。Executors.newCachedThreadPool就是采用这种任务队列。不保留，直接开线程去执行任务。
 		
 	- 有界任务队列
-		ArrayBlockingQueue,其构造参数 public ArrayBlockingQueue(int capacity) 带了一个容量，表示队列
-		的最大容量。注意，这里的执行流程就和【2、线程执行流程】一致。为的是尽量将线程数量保持在
+		ArrayBlockingQueue,其构造参数 public ArrayBlockingQueue(int capacity) 带了一个容量，表
+		示队列的最大容量。注意，这里的执行流程就和【2、线程执行流程】一致。为的是尽量将线程数量保持在
 		corePoolSize .
         
 	- 无界任务队列
 		LinkedBlockingQueue,除非资源耗尽，否则不会出现任务队列已满的情况。他和有界有点区别，即，先判断
 		核心线程数是否满了，没有则创建线程执行任务，满了则如队列，一直入，不会达到线程池最大线程的情况。
-		Executors.newSingleThreadExecutor、newFixedThreadFactory即是无界队列，因为corePoolSize =  		maximum .
+		Executors.newSingleThreadExecutor、newFixedThreadFactory即是无界队列，因为	
+		corePoolSize = maximum .
 		
 	- 优先任务队列
 		PriorityBlockingQueue,优先任务队列是带优先级的队列，可以控制任务的执行先后顺序，是特殊的，
