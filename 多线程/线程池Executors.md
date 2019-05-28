@@ -56,7 +56,12 @@ public ThreadPoolExecutor(
     	ThreadFactory threadFactory, //创建线程的工厂
     	RejectedExecutionHandler handler //拒绝策略
 )
+    
+//记录任务数量
+private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
 ```
+
+
 
 ### 2、线程执行流程
 
@@ -134,13 +139,31 @@ JDK内置四种拒绝策略：
 
 ### 5、线程池的状态
 
-​	**volatile int runStatue ;**
+https://blog.csdn.net/GoGleTech/article/details/79728522
 
-```
-static final int RUNNING = 0 ; //线程池初始化后的状态
-static final int SHUTDOWN = 1 ; //调用shutdown()
-static final int STOP = 2 ; //调用了shutdownNow()
-static final int TEMINATED = 3 ; //终止状态。
+状态图：
+
+![è¿éåå¾çæè¿°](https://img-blog.csdn.net/20180328153220367?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvR29HbGVUZWNo/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+```java
+ThreadPoolExecutor定义了5中状态：
+private static final int RUNNING  = -1 << COUNT_BITS;
+private static final int SHUTDOWN = 0 << COUNT_BITS;
+private static final int STOP = 1 << COUNT_BITS;
+private static final int TIDYING = 2 << COUNT_BITS;
+private static final int TERMINATED = 3 << COUNT_BITS;
+
+1、RUNNING
+	线程池被创建，就处于RUNNING状态，可以接受新的任务，此时线程数量 ctl 为 0；
+2、SHUTDOWN
+	RUNNING调用shutdown()方法， 此时不会再接收新的任务，但是会让正在执行的任务和任务队列里的任务都执行完。
+	全部执行完之后，即ctl为0时，状态转为 TIDYING 。
+3、STOP
+	RUNNING调用shutdownnow()方法，立刻停止线程池，中断正在执行的，抛弃等待队列的。当ctl为0时，进入TIDYING	  状态。
+4、TIDYING
+	ctl为0了，此时会调用terminated(）方法进入TERMINATED状态，这是个空方法，可以重写添加额外操作
+5、TERMINATED
+	线程池彻底终止。
 ```
 
 
