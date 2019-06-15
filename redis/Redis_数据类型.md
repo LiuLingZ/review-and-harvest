@@ -55,8 +55,11 @@
 
 - 字符由多个字节组成，一个字节由8个bit组成，所以一个字符串看成很多bit组合，是bitmap[位图]数据结构。
 
-
-
+```
+要点：
+- 类似Java的ArrayList,由一个个字节组成，一个字节占8 bit 。
+- 动态变更长度，可扩容。＜1M，则每次 * 2 ； ≥ 1M，每次扩容 +1M。
+```
 
 
 
@@ -100,6 +103,13 @@
 
    - redis的列表底层不仅仅只类似LinkedList，如果只是单纯的list,使用一个个内存块，容易造成内存的碎片化。并且一个结点就要额外存储pre和next两个指针，容易造成内存的浪费。因此，当元素比较少时，就使用一整块的连续空间，这空间里面就是个数组，此结构称为**ziplist(压缩列表)** ；当元素较多时，就分为多个ziplist , ziplist 本身保存了pre 和 next指向别的ziplist， 形成链，此链称为 **快速列表（quicklist）** 。这样就删除了大量的冗余内存，并且减少内存的碎片空间。（这倒和ConcurrentHashMap底层原理差不多，一个一个segment组成一个concurrentHashMap）
 
+```
+要点：
+- 类似Java的LinkedList ，双向链表。
+- 根据规定的出队入队顺序，可做 队列 或 栈 。 
+- 底层其实是 快速链表 的形式。元素节点 → 压缩链表 → 快速链表 
+```
+
 
 
 
@@ -136,6 +146,12 @@
   - 同字符对象一样，hash结构单个子key也可计数，对应指令hincrby 和 incr一样
 
     hincrby user-ling age 2 # age+2
+
+```
+注意：
+- hash只能存字符串
+- string虽然比hash省空间，但是读取效果不如hash，因为string需要完整取出再读取，hash可以取出部分属性直接读。
+```
 
 
 
@@ -183,7 +199,10 @@
 
     zrem books "java concurrency"  # 删除 value
 
-
+```
+要点：
+- 带分数的集合
+```
 
 
 
