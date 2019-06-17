@@ -88,6 +88,8 @@ RDB文件根据当前父进程的内存生成临时快照文件，完成后对�
 
 ### 0、过程
 
+https://www.cnblogs.com/iamsach/p/8490387.html
+
 ```
 AOF流程：文件写入(append) 、文件同步（sync）、文件重写（rewrite）、重新加载（load）
 
