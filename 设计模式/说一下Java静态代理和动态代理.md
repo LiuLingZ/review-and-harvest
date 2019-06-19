@@ -26,6 +26,16 @@ https://www.cnblogs.com/cenyu/p/6289209.html
 
 Proxy这个类的作用就是用来动态创建一个代理对象的类，它提供了许多的方法，但是我们用的最多的就是 newProxyInstance 这个方法：这个方法的作用就是得到一个动态的代理对象，其接收三个参数
 
+```java
+public static Object newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h) throws IllegalArgumentException
+
+loader:　　一个ClassLoader对象，定义了由哪个ClassLoader对象来对生成的代理对象进行加载
+
+interfaces:　　一个Interface对象的数组，表示的是我将要给我需要代理的对象提供一组什么接口，如果我提供了一组接口给它，那么这个代理对象就宣称实现了该接口(多态)，这样我就能调用这组接口中的方法了
+
+h:　　一个InvocationHandler对象，表示的是当我这个动态代理对象在调用方法的时候，会关联到哪一个InvocationHandler对象上
+```
+
 
 
 ### 1、三者关系
@@ -44,7 +54,7 @@ Proxy这个类的作用就是用来动态创建一个代理对象的类，它提
 ####生成代理对象
 
 * Proxy的newProxyInstance()方法创建真正的代理对象
-* 可以调用被代理的业务方法，因为传入了被代理类实现的接口参数，但是，**不是被代理的类型，而是一个Proxy的内部类的类型！！！！！！**
+* 可以调用被代理的业务方法，因为传入了被代理类实现的接口参数，但是，**不是被代理的类型，其类型可转换为我们传入的接口集合中的任何一个。**
 
 
 
