@@ -22,7 +22,7 @@ https://mp.weixin.qq.com/s/IJt-oYl5DVJIlc8uYwLj2w
 
 ## 1、存储结构
 
-​	类似map，但不是map，只是概念上是Map，节点是一个个Entry实例，包含key \ value \ 前一个节点 \ 后一个节点 ，这样形成的是个环，大小是2的幂 ， 采用的是线性探测法来避免冲突。
+​	类似map，但不是map，只是概念上是Map，节点是一个个Entry实例，大小是2的幂 ， 采用的是线性探测法来避免冲突。
 
 ```java
 ThreadLocalMap含有一个Entry类型的数组， Entry[] ， 查看这个Entry，是实现了WeakReferance的类
