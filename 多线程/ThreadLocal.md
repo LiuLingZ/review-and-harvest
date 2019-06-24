@@ -14,7 +14,7 @@ https://mp.weixin.qq.com/s/IJt-oYl5DVJIlc8uYwLj2w
 	比如服务端可以创建一个ThreadLocal用来存储用户信息，当用户来访并在页面间进行多种业务时，可以直接获得属于	 自己的信息，ThreadLocal使线程隔离，使用属于自己的变量副本，多线程间互不干扰。
 
 大致思路：
-	Thread类中含了一个ThreadLocal.ThreadLocalMap的threadLocals实例，这意味每个线程都有自己的一个		threadLocals。ThreadLocalMap是个特殊的hashmap，是个环状的hashMap，每个节点是一个Entry。Entry里含	 key、value。可以简单认为，key是继承ThreadLocal的一个弱引用，value是存储的变量副本。	
+	Thread类中含了一个ThreadLocal.ThreadLocalMap的threadLocals实例，这意味每个线程都有自己的一个		threadLocals。ThreadLocalMap是个特殊的hashmap，是个环状的hashMap，每个节点是一个Entry。Entry里含	 key、value。key是指向ThreadLocal的一个引用。	
 
 ```
 
@@ -50,9 +50,13 @@ ThreadLocalMap含有一个Entry类型的数组， Entry[] ， 查看这个Entry�
 
 ## 2、弱引用和内存泄漏
 
-​	Entry是一个继承WeakReference类的对象。弱引用的特点是，引用的对象活不到下一个GC 。 这样的好处是，一旦ThreadLocal被GC，那么引用这个ThreadLocal的Entry也就要被回收，方便内存回收。
+​	Entry是一个继承WeakReference类的对象。弱引用的特点是，引用的对象活不到下一个GC 。 这样的好处是，Entry不会和该线程强绑定，就不至于跟着线程的生命周期存活，避免一直占用内存。
 
-​	但是其实也有问题，因为即使Entry被标记为可回收，但只是key断了，value还是有一个强引用，即备份还是通过一个Object对象引用，这一部分没有被标记为可回收。当然，这是和线程绑定的，这个线程结束，这部分的内存也被回收，但是在线程池的情况就不一定了，不是说不被回收，而是线程不会结束，如corePoolSize数目的保活，这部分对象没有被利用但也不会被回收，造成内存泄漏。其实也是概念问题，不会真的内存泄漏，只是按这种情况这么说，就可以理解为内存泄漏了。
+​	这里要注意，实际上是ThreadLocal如果被回收，即为null，那么 Entry 的key == null 了，虽然是弱引用类型，但是，此时还没有被回收，所以，还是有一条引用 ： Thread -> ThreadLocalMap -> Entry -> value ，所以此时内存被占用，但是不会被使用，只要GC一定会被回收，但是没GC就没法回收了，所以，所谓内存泄漏，看时机。
+
+​	Entry的key本身也是一个弱引用，指向ThreadLocal 。GC时，这个key会断掉，key==null 。Entry本身也会被回收。
+
+
 
 
 
@@ -60,7 +64,7 @@ ThreadLocalMap含有一个Entry类型的数组， Entry[] ， 查看这个Entry�
 
 ## 3、类成员变量
 
-​	负载因子 2/3 ；
+​	负载因子 2/3 ；（len * 2/3）
 
 ​	Entry表， 必须是2的幂，为的是尽可能的均匀散列。可以参考hashMap的长度，原理是一样的。
 
@@ -70,6 +74,9 @@ ThreadLocalMap含有一个Entry类型的数组， Entry[] ， 查看这个Entry�
 	ThreadLocal本身含有一个魔数，相当于此ThreadLocal的ID，计算hashcode时需要用上， 计算出来的结果再
 	与2的幂相与能较为均匀地散列在Entry[]上。
 	即便存在冲突，也可以通过“线性探测法”寻找最近的下个空闲Entry,解决冲突。
+
+Entry[]是逻辑上的一个环，提供了往前或者往后的索引。
+
 	
 “线性探测法”：
 	类似停车。
@@ -77,9 +84,42 @@ ThreadLocalMap含有一个Entry类型的数组， Entry[] ， 查看这个Entry�
 
 
 
-## 4、关于回收
 
-​	因为是弱引用，经过一次GC可能就不存在了，此时这个Entry实际就是没用的，需要更新，那么对于setEntry 、 getEntry 、 remove方法，都可能触发对Entry数组的全量清理。
 
-​	同时为了防止上面的“内存泄漏”，建议就是删除ThreadLocal时，显示使用remove，会触发全量清理，清理没用的Entry。
+## 4、关于key的定位
+
+```
+	类似于HashMap的定位，长度为2的幂，而为了均匀散列，ThreadLocal这样计算自己的hashcode :
+	
+	每个ThreadLocal初始化时都有一个“魔数”成员变量，通过这个魔数计算出TnreadLocal自己的hashcode，相当于这个ThreadLocal的ID，在于长度-1相与，就可以均匀散列了。
+	
+	并且对于hash冲突，采用线性探测法。
+	
+	如果获得索引后去取，不是想要的（即在上一次可能通过线性探测法被别的元素占用了），就向下遍历，遇到key==null的，即ThreadLocal已经被清除了，就会调用清除方法，把这个无效的Entry给清除。然后再向下遍历。直到找到对应的Entry
+```
+
+
+
+## 5、关于扩容
+
+```
+阈值定于 长度的 2/3 ： threshold = len * 2/3 ， 如果到达，就会触发一次rehash，rehash的同时会触发一次全量清除，清除那些已经失效的Entry,然后rehash，之后得到的数组长度 , 如果还超过数组容量的 1/2 ： 
+threshold-threshold * 1/4 ， 就会彻底触发扩容。扩容2倍。
+```
+
+
+
+## 6、关于remove
+
+```
+直接清除了对应位置的值，完全清空，所以建议当一个ThreadLocal弃用的时候，显示调用一次 threadLocal.remove()
+```
+
+
+
+
+
+
+
+
 

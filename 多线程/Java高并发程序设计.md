@@ -395,13 +395,15 @@ https://www.cnblogs.com/paddix/p/5381958.html
 
 ## 停止线程的方式
 
-https://www.cnblogs.com/greta/p/5624839.html
+https://www.cnblogs.com/skywang12345/p/3479949.html
 
 ### 一、通过异常+return
 
 ​	此时线程可能 sleep() \ join() \ wait()  ，那么这时，直接调用线程的 interrupt() ，线程会产生一个 InterruptedException，捕获，然后return 即可。
 
-​	运行过程调用interrupt（）不会强制终止线程，只是标了终止记号后，线程再自己不定期停止线程。
+​	运行过程调用interrupt（）不会强制终止线程，只是标了终止记号，我们可以通过 while(isInterrupted())判断，如果中断标记为true 就可以停下了。当然可能需要考虑 interrput() 时线程正处于阻塞状态，那么就需要捕获异常。
+
+​	还有一种方式，通过自己定义的一个变量flag ， 但是为了保证线程的可见性，需要volatile修饰。
 
 
 
