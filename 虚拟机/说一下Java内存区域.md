@@ -1,5 +1,7 @@
 # 说一下Java内存区域
 
+https://www.cnblogs.com/ityouknow/p/5610232.html
+
 #### 		是什么？	
 
 #### 	线程私有公有？
