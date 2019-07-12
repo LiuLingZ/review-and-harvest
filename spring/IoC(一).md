@@ -43,6 +43,55 @@ ApplicationContext 可以称之为 “高级容器”。因为他比 BeanFactory
 
 
 
+## Spring IoC容器设计
+
+```java
+两条设计路线：
+
+
+//BeanFactory <I> → HierarchicalBeanFactory <I> → ConfigurableBeanFactory <I> 。
+
+- BeanFacory：
+	最基本的IoC容器接口，定义了容器是否有Bean、Bean类型（单例、多例）、别名这些基本功能。
+- HierachicalBeanFactory：
+	继承了前者，并且定义了关于父容器相关的方法：getParentBeanFactory（），使BeanFactory具备双亲IoC容器的
+	管理功能。
+- ConfigurableBeanFactory:
+	定义了BeanFactory的大多数配置功能，如添加Bean的后置处理器：addBeanPostProcessor()。
+	
+//最终层层叠加，定义了BeanFactory 简单IoC容器的基本功能。
+
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+
+// BeanFactory → ListableBeanFactory → ApplicationContext → （我们常用的）WebApplicationContext/ConfigurableApplicationContext
+
+- 这是以ApplicationContext为核心的接口设计
+- 这个体系中，ApplicationContext继承了ListableBeanFactory 和 HierarchicalBeanFactory两接口，这两接口再	 继承于 BeanFactory，这两接口是此实现的桥梁。
+- ListableBeanFactory：
+	细化了很多BeanFactory接口的方法，如getBeanDefinitionNames（）；
+- ApplicationContext：
+	继承了其他接口如MessageSource和ApplicationEventPublisher等，在简单的BeanFactory上扩展了额外的高级容
+	器的特性。
+
+
+
+/*
+-	上面是主要的接口关系，大部分具体的IoC容器实现都是实现某些接口的，如DefaultListableBeanFactory就是实现
+	ConfigurableListableBeanFactory接口（其继承于ListableBeanFactory）。
+
+-	这个系统是以BeanFactory和ApplicationContext为核心设计的。ApplicationContext除了继承了BeanFactory系	  列下的ListableBeanFactory和HierarchicalBeanFactory接口，还额外实现了其他如资源、环境相关的接口，赋予     更高级容器的特性。
+
+*/
+
+-------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+
+
+```
+
+
+
 ## Spring IoC 的初始化过程
 
 1. 用户构造 ClassPathXmlApplicationContext（简称 CPAC）
