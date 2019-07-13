@@ -87,6 +87,21 @@ ApplicationContext 可以称之为 “高级容器”。因为他比 BeanFactory
 -------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------
 
+//ApplicationContext ：
+public interface ApplicationContext extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory, MessageSource, ApplicationEventPublisher, ResourcePatternResolver {
+	···
+}
+	
+
+
+
+
+
+
+
+
+
+
 
 ```
 
