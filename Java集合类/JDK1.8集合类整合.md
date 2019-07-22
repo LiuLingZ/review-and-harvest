@@ -186,6 +186,22 @@ http://www.codeceo.com/article/java-hashmap-concurrenthashmap.html
 
 
 
+#### TreeMap
+
+- 也是一个map，支持key-value;
+- 底层根据红黑树实现，get \ put \ containKey \ remove 等节点操作时间复杂度都是 O(logn)
+- 并不是线程安全的，支持 fast-fail
+- 底层key是有序的，可以返回有序的keys集合，因为红黑树。
+- 默认key是根据自然排序（数从小到大，字母从a到z），也可以在初始化的时候提供一个compare，即提供一个排序规则。
+
+
+
+
+
+
+
+
+
 #### 红黑树（自平衡的二叉搜索树）
 
 ```

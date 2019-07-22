@@ -1,4 +1,4 @@
-       4项目例子：IDEA：IDEAProject\JavaSE\javaBasics\src\main\java\com\lingz\Thread\threadPool
+       项目例子：IDEA：IDEAProject\JavaSE\javaBasics\src\main\java\com\lingz\Thread\threadPool
 
 参考：
 
