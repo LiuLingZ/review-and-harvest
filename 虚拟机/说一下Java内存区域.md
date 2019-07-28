@@ -83,9 +83,15 @@ https://www.cnblogs.com/ityouknow/p/5610232.html
 
 2、几乎说所有的对象都在对分配，但是现在也有栈上分配（JIT和逃逸技术的发展）
 
+​	（关于逃逸分析：https://mp.weixin.qq.com/s/gtKysPvVoTvtu_cApvZHAg）
+
 3、堆也称GC堆，因为垃圾回收主要在堆上进行。现在堆的回收基本都是“分代收集算法”，所以堆也可细分为“新生代”、“老年代”。
 
-4、堆是线程共享的，然而堆中也可划分为多个线程私有的分配缓冲区（Thread Local Allocation Buffer,TLAB）。线程私有的分配缓冲区同步问题可以由Java内存模型解决。
+4、堆是线程共享的，然而堆中也可划分为多个线程私有的分配缓冲区（Thread Local Allocation Buffer,TLAB），避免一定的线程竞争，毕竟共享的东西独占需要加锁。线程私有的分配缓冲区同步问题可以由Java内存模型解决。总体来说堆是线程共享的，但是在堆的年轻代中的Eden区可以分配给专属于线程的局部缓存区TLAB，也可以用来存放对象。相当于线程私有的对象。
+
+（https://www.cnblogs.com/straybirds/p/8529924.html）
+
+
 
 5、堆的大小设置参数：
 
@@ -96,8 +102,6 @@ https://www.cnblogs.com/ityouknow/p/5610232.html
 ##### 四、关于OOM
 
 ​	堆中没有内存用于分配实例、或者堆无法扩展，就OOM 。
-
-
 
 
 

@@ -301,9 +301,9 @@
 
 ​	因为CMS是标记-清除。会有空间碎片，解决方案 ： **压缩**
 
-​	① 参数-XX：+UseCMSCompactAtFullCollection ，代表老年代要Full GC时开启内存碎片合并整理，这是无法并发的，GC时间变长。默认是开的
+​	① 参数-XX：+CMSFullGCsBeforeCompaction ，代表老年代要Full GC时开启内存碎片合并整理，这是无法并发的，GC时间变长。默认是开的
 
-​	② 参数-XX：+CMSFullGCsBeforeCompaction  ，此参数设置，多少次不压缩的Full GC后，执行一次带压缩的Full GC，默认0，代表Full GC每次都压缩。	
+​	② 参数-XX：+UseCMSCompactAtFullCollection ，此参数设置，多少次不压缩的Full GC后，执行一次带压缩的Full GC，默认0，代表Full GC每次都压缩。	
 
 ---
 
@@ -320,7 +320,7 @@
 2、空间整合
 	不会产生内存碎片。从整体上，G1看起来是标记-整理；而从细节上看，是两个Region在进行复制算法。没有空间碎片	有利于程序长久运行。
 3、可预测的停顿
-	并不是对所有的Region进行回收，而是通过计算每个Region的回收时间和得到的内存大小做判断，根据权衡选择性回	 收性价比最大的。比如时间就那么多，那就选一个最大性价比的回收。坐到类似实时Java回收机制。
+	并不是对所有的Region进行回收，而是通过计算每个Region的回收时间和得到的内存大小做判断，根据权衡选择性回	 收性价比最大的。比如时间就那么多，那就选一个最大性价比的回收。做到类似实时Java回收机制。
 ```
 
 ##### 可预测的停顿
@@ -407,3 +407,33 @@
 ### 4、空间担保机制
 
 ​	发生Minor GC前，JVM会先检查 老年代所剩空间是否大于新生代所有存活对象所占内存，如果大，则这个Minor GC是安全的； 反之不安全，这是，根据判断 HandlePromotionFailure 担保是否允许失败，如果不允许，即不允许冒险，就会提前出发一次 Full GC 。大多数允许冒险，避免频繁 Full GC.
+
+
+
+
+
+## 六、各种问题
+
+### 1、什么时候GC
+
+```
+说到GC，首先要想到的是full gc 和 minor gc 、 major(old) gc
+Young GC：也叫minor gc.只收集young gen的GC
+Old GC：也叫major gc,只收集old gen的GC。只有CMS的concurrent collection是这个模式
+Full GC：收集整个堆，包括young gen、old gen、perm gen（如果存在的话）等所有部分的模式。
+
+但是现在发展后定义模糊，full gc可能被说成是老年代的gc，所以还是问清楚，接下来下面都是当做老年代gc 。
+
+
+
+minor gc:
+- 新生代Eden满了的时候触发。比较频繁。注意，此时可能会有一些对象晋升到老年代。
+
+full gc:
+- 当要发生minor gc时，可能先触发full gc,因为老年代作为最后的空间，必须保证剩余空间能容纳新生代所有对象，以防一下子有大量对象涌入，如果发现不够，根据担保策略，触发一次full gc 。
+- System.gc()方式也是触发full gc 。
+
+
+
+```
+
