@@ -75,7 +75,7 @@ https://www.cnblogs.com/leesf456/p/5308843.html
 
 ### 一、JDK1.7
 
-#### HashMap
+#### HashMap(1.7)
 
 详细介绍： https://mp.weixin.qq.com/s/dzNq50zBQ4iDrOAhM4a70A
 
@@ -98,9 +98,11 @@ https://www.cnblogs.com/chengxiao/p/6059914.html
 
 
 
-#### ConcurrentHashMap
+#### ConcurrentHashMap(1.7)
 
 https://mp.weixin.qq.com/s/1yWSfdz0j-PprGkDgOomhQ
+
+https://blog.csdn.net/qq_33589510/article/details/79962152
 
 - 线程安全有Hashtable 和 Collections.synchronizedMap，但是性能都不佳。无论读写操作，都只是给方法单纯加锁。 ConcurrentHashMap 则为优选
 
@@ -112,13 +114,33 @@ https://mp.weixin.qq.com/s/1yWSfdz0j-PprGkDgOomhQ
 
 - ConcurrentHashMap的size（）采用乐观锁的实现。即统计长度时，先从每个Segment统计Entry个数，最后合并。期间还会统计所有Segment修改次数，如果和统计数目前的修改次数一致，则统计成功，如果不一致，重新统计（因为统计过程有其他线程并发增加、删除了元素）。当失败次数达到一定次数，就直接锁住全部Segment，再重新统计。
 
-- 关于put（），get()
-
-  第一次hash，定位到Segment,获得此Segment的可重入锁，再次hash，定位到具体位置，覆盖或插入。释放锁。
-
-  第一次hash，定位到Segment,再次hash，定位到具体位置。
-
-  两次hash是为了精确定位到Segment中的位置。
+  ```java
+  https://www.cnblogs.com/study-everyday/p/6430462.html
+  1.7时底层是 HashEntry[]
+  
+  初始化：
+  - concurrentHashMap通过位运算进行初始化segment的大小，sszie表示，默认是16，最大可以是65536个段（因为 
+    最大规定只能向左移16位,属性是并发级别设置为16）
+  - HashEntry的也是通过左移确定大小的。所以只能是2的n次方大小，这也与hash相与确定位置有关。
+  
+  put()
+  - put操作，需要两次定位，Segment是继承于ReentrantLock的，所以Segment具备锁能力 ；
+  - 第一次定位到Segment，如果Segment还没有初始化，就通过CAS进行初始化，成功则下一步，不成功可能就初始化 
+    好了。
+  - 定位到Segment后，接下来就在要插入的位置，通过继承得到的tryLock()尝试加锁，加锁成功则直接插入到链表尾
+    部，如果tryLock失败说明有正在加锁插入的，则自旋等待释放锁，如果自旋次数超过阈值就挂起阻塞等待。
+  （CAS初始化Segment，tryLock加对应位置的锁，成功则插入，失败自旋等待，超过阈值阻塞挂起。）
+  
+  
+  get()
+  - 两次定位，第一次hash定位到Segment，第二次才定位到准确位置，然后遍历链表比较匹配，匹配成功返回，失败null.
+      
+  
+  size()
+  - 是通过统计segment的段的size得到的。
+  - segment继承于ReentrantLock,他是先不加锁，尝试直接对每个段进行统计，相加，然后再进行重复统计，相加，   比较两次结果，如果相同，就说明没有在统计时修改元素，返回。而如果不同，则重试，直到次数小于      
+    RETRIES_BEFORE_LOCK.默认是失败重复一次，如果失败就直接用ReentrantLock加锁统计，再求和比较，这时候就   一样了，就返回。
+  ```
 
   
 
@@ -128,7 +150,7 @@ https://mp.weixin.qq.com/s/1yWSfdz0j-PprGkDgOomhQ
 
 ### 二、JDK1.8
 
-#### HashMap
+#### HashMap(1.8)
 
 http://www.codeceo.com/article/java-hashmap-concurrenthashmap.html
 
@@ -171,7 +193,7 @@ http://www.codeceo.com/article/java-hashmap-concurrenthashmap.html
 
 
 
-####ConcurrentHashMap
+####ConcurrentHashMap(1.8)
 
 http://www.codeceo.com/article/java-hashmap-concurrenthashmap.html
 
@@ -183,6 +205,82 @@ http://www.codeceo.com/article/java-hashmap-concurrenthashmap.html
   3. 通过key定位，为空、根据链表或红黑树的规则，通过CAS尝试，失败则synchronized
   4. 判断是否需要变为红黑树
   5. 判断是否需要扩容
+
+```
+https://www.cnblogs.com/study-everyday/p/6430462.html
+JDK1.8的实现已经摒弃了Segment的概念，而是直接用Node数组+链表+红黑树的数据结构来实现，并发控制使用Synchronized和CAS来操作，整个看起来就像是优化过且线程安全的HashMap，虽然在JDK1.8中还能看到Segment的数据结构，但是已经简化了属性，只是为了兼容旧版本
+
+Node内部类
+- 是ConcurrentHashMap的基本存储单元，继承与Map的Entry，用于存储数据，提供的方法是只能读不能修改。
+- 其中的find方法就是比较这个node节点用
+
+
+TreeNode内部类
+- 用于红黑树，当链表长度>8，转红黑树，这个TreeNode就是存红黑树节点用的。继承与上面的Node内部类。
+
+TreeBin内部类
+- 理解为存储树形结构的容器，就是用来存储TreeNode的，封装了链表转为红黑树的方法和红黑树锁控制的方法、节点查
+  找方法，相当于功能集合。
+ 
+初始化
+- ConcurrentHashMap的构造器是空的，初始化操作在put中。
+
+put操作
+- 如果没有初始化，就调用initTable()进行初始化。
+- 初始化后，尝试用CAS插入，没有冲突则插入成功。
+- put时可能在扩容，那就先扩容；
+- 如果有冲突，CAS插入失败，就通过加锁方式synchronized同步代码块，按照链表或红黑树结构，链表插在尾部，红黑树
+  则按照其结构插入。
+- 如果插入后链表长度>8，则调用TreeBin方法转换为红黑树
+- 添加成功后addCount()，增加size长度，看是否要扩容
+- 如果扩容后，重新hash，有的红黑树可能就需要变为链表 <=6 时。
+
+
+扩容
+- 扩容刚开始调用的是helpTransfer方法，通过多线程协助扩容，提高效率，transfer真正扩容。
+- 有个 sizeCtl 的属性值，-1代表当前一个线程在操作，-N代表N个线程在操作，通过CAS协助扩容，而不是阻塞等待扩容 
+  完成。
+
+
+
+get（）
+- 计算hash值，定位到具体Node位置
+- 判断首节点，同返回，不同则向下遍历
+- 如果遇到正在扩容，就通过正在扩容的Node节点的find方法比较，匹配就返回。
+
+
+size()
+- 1.8时的size在扩容和put的时候已经计算好了，直接返回就行。
+- 1.7则是在size通过比较两次，失败加锁统计的方式。
+
+
+```
+
+
+
+
+
+#### 1.7 和 1.8 ConcurrentHashMap比较
+
+```
+- 1.7通过CAS+Segment+ReentrantLock
+- 1.8则开始和HashMap的结构相同，使用CAS+synchronized+HashEntry+红黑树
+
+- 1.8降低了锁粒度，1.7粒度为Segment，1.8是当个HashEntry节点
+
+- 关于Synchronized代替了ReentrantLock :
+  - Synchronized在1.6之后性能并不比ReentrantLock差，并且synchronized是基于JVM的不是API，有提升空间
+  - 粒度变小，本来ReentrantLock对segment这种粒度较大的情况，Condition等待唤醒比较灵活，现在没了。
+  - API的，自然带来更多开销，创建对象什么的。虽然不是瓶颈，但是有的。
+```
+
+
+
+
+
+
+
+
 
 
 
