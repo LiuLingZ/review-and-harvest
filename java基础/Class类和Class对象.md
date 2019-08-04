@@ -1,3 +1,5 @@
+https://www.cnblogs.com/lzq198754/p/5780331.html
+
 ##Class类和Class对象
 
 ###1、RTTI 
