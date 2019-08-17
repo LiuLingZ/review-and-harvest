@@ -14,7 +14,15 @@ https://mp.weixin.qq.com/s/IJt-oYl5DVJIlc8uYwLj2w
 	比如服务端可以创建一个ThreadLocal用来存储用户信息，当用户来访并在页面间进行多种业务时，可以直接获得属于	 自己的信息，ThreadLocal使线程隔离，使用属于自己的变量副本，多线程间互不干扰。
 
 大致思路：
-	Thread类中含了一个ThreadLocal.ThreadLocalMap的threadLocals实例，这意味每个线程都有自己的一个		threadLocals。ThreadLocalMap是个特殊的hashmap，是个环状的hashMap，每个节点是一个Entry。Entry里含	 key、value。key是指向ThreadLocal的一个引用。	
+每个线程Thread都有一个 
+ThreadLocal.ThreadLocalMap 对象，
+Entry : key value 
+key 就是指向那个ThreadLocal的弱引用，value就是我们的真实值
+所以说，真正存储值的，是各自的每个线程，通过这个ThreadLocal识别存的是哪个Key
+
+get时，获得当前线程的ThreadLocalMap，然后通过ThreadLocal找到key value（通过get方法就可看到这个过程。）
+set时，通过线性探测法插入。
+
 
 ```
 
