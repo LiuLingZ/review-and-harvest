@@ -90,7 +90,7 @@ https://www.cnblogs.com/chengxiao/p/6059914.html
 - 扩容时机： 实际长度 ≥ 负载因子 * 总长 。 负载因子默认0.75，初始化时可修改。
 - 扩容是就会涉及到 ReSize 和 ReHash过程。前者是扩容，后者是将元素从旧数组复制到新数组中。
 - Resize 是先创建两倍长的数组，再从 旧数组Rehash到新的对应位置。
-- HashMap在多线程是不安全的，并发插入元素后可能出现带环的链表，在下次访问时出现死循环。
+- HashMap在多线程是不安全的，并发插入元素后如果导致并发resize，可能出现带环的链表，在下次访问时出现死循环。https://coolshell.cn/articles/9606.html
 
 - JDK1.7在put的时候判断有没有table，没有才真正初始化一个table。JDK1.8则是在put中先判断是否resize（）,因为一开始没有容量，所以触发第一次初始化。
 

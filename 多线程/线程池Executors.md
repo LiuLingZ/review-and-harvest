@@ -108,7 +108,7 @@ ThreadPoolExecutor可以使用:
 内容：如果超出规定范围的任务，当作何处理
 
 JDK内置四种拒绝策略：
-	- AbortPolicy: 该策略直接抛异常，阻止程序运行。（显然不妥）
+	- AbortPolicy: 该策略直接抛异常，阻止程序运行。线程池出异常会直接终止。（显然不妥）
 	- CallerRunsPolicy:让提交任务的线程去执行任务，但是这样对提交任务的线程的性能影响很大。
 	- DiscardOldestPolicy:丢弃最老的一个等待任务，即丢弃排在队列最前头的任务，然后插入新任务。(不妥)
 	- DiscardPolicy:直接丢弃（显然能够接受）
