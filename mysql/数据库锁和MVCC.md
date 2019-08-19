@@ -32,7 +32,7 @@ SELECT ... **FOR UPDATE**;
 
 ## 1、加锁时机
 
-​	对于insert、update、delete，InnoDB会自动给涉及的数据加排他锁（X）；对于一般的Select语句，InnoDB不会加任何锁，事务可以通过以下语句给显示加共享锁或排他锁。
+​	对于insert、update、delete，InnoDB会自动给涉及的表加排他锁（X）；对于一般的Select语句，InnoDB不会加任何锁，事务可以通过以下语句给显示加共享锁或排他锁。
 
 共享锁：SELECT ... LOCK IN SHARE MODE;
 
