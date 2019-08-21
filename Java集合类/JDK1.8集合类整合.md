@@ -29,7 +29,7 @@ ArrayList有其特殊的应用场景，与LinkedList相对应。其优点是随�
 
 https://www.cnblogs.com/zhangzongle/p/5432212.html
 
-- 底层是一个Object[] elementData 数组，和ArrayList一样，随机访问快，删除慢，需要移动元素
+- 底层是一个Object[] elementData 数组，和ArrayList一样，随机访问快，删除慢，需要移动元素，是并发安全的，方法都加了synchronized修饰。
 - 默认大小是10，可指定大小。每次扩容是2倍扩容
 - 有个capacityIncrement ， 可以在初始化时指定，指定后，每次扩容都是扩 capacityIncrement 
 
@@ -48,6 +48,27 @@ https://www.cnblogs.com/dolphin0520/p/3938914.html
 内存占用：写的时候复制一份一模一样的大小的，在一个时间段内存驻留两个大对象，容易造成GC。
 
 数据一致性：写的过程是复制，写；这个过程无法读到新的数据，所以要求立刻读到新的数据时，不要用CopyOnWriteArrayList。
+
+```java
+/*
+	CopyOnWriteArrayList 的 add() ，通过可重入锁加锁。
+*/
+
+public boolean add(E e) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            Object[] elements = getArray();
+            int len = elements.length;
+            Object[] newElements = Arrays.copyOf(elements, len + 1);
+            newElements[len] = e;
+            setArray(newElements);
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+```
 
 
 
@@ -187,7 +208,12 @@ http://www.codeceo.com/article/java-hashmap-concurrenthashmap.html
 - 判断索引处第一个key与传入key是否相等，如果相等直接返回
 - 如果不相等，判断链表是否是红黑二叉树，如果是，直接从树中取值
 - 如果不是树，就遍历链表查找
+
 ```
+
+- 转红黑树过程：
+
+  如果链表节点数大于等于8个，就调用TreeBin这个内部树的工具的方法，根据每个链表的节点，创建出新的树节点，然后构造红黑树。
 
 
 
@@ -234,6 +260,10 @@ put操作
 - 如果插入后链表长度>8，则调用TreeBin方法转换为红黑树
 - 添加成功后addCount()，增加size长度，看是否要扩容
 - 如果扩容后，重新hash，有的红黑树可能就需要变为链表 <=6 时。
+
+1.7 ReentrantLock的tryLock()+自旋+阻塞
+1.8 CAS一次，失败Synchronized
+
 
 
 扩容
@@ -286,13 +316,15 @@ size()
 
 #### TreeMap
 
+https://www.cnblogs.com/chenssy/p/3746600.html
+
 - 也是一个map，支持key-value;
 - 底层根据红黑树实现，get \ put \ containKey \ remove 等节点操作时间复杂度都是 O(logn)
 - 并不是线程安全的，支持 fast-fail
 - 底层key是有序的，可以返回有序的keys集合，因为红黑树。
 - 默认key是根据自然排序（数从小到大，字母从a到z），也可以在初始化的时候提供一个compare，即提供一个排序规则。
 
-
+![2014051700002](https://images0.cnblogs.com/blog/381060/201405/222222278405105.png)
 
 
 
@@ -318,7 +350,7 @@ size()
 		3.每个叶子节点都是黑色的空节点（NIL节点）。
 		4 每个红色节点的两个子节点都是黑色。(从每个叶子到根的所有路径上不能有两个连续的红色节点)
 		5.从任一节点到其每个叶子的所有路径都包含相同数目的黑色节点。
-	
+		PS：这样规定后，最长的子树长度不会超过最短的一倍，自平衡。
 	变色
 		为了重新符合红黑树的规则，尝试把红色节点变为黑色，或者把黑色节点变为红色。
 	自旋
@@ -431,6 +463,8 @@ CAS：
 
 
 ##  5、关于null值
+
+​	**一定注意，ConcurrentHashMap的key\value都不能为null !!!**
 
 | Hashtable         | 不允许为 null | 不允许为 null | Dictionary  | 线程安全               |
 | ----------------- | ------------- | ------------- | ----------- | ---------------------- |

@@ -190,9 +190,14 @@ submit() :
 
 
 
+### 8、线程池核心线程数设置
 
+https://www.cnblogs.com/rinack/p/10557969.html
 
+https://www.cnblogs.com/dennyzhangdd/p/6909771.html?utm_source=itdadao&utm_medium=referral
 
+- CPU密集型，一般推荐N+1个，N是CPU数，因为CPU密集型，CPU使用频率高，多出来的1条是防止出现错误或卡顿导致CPU的空闲。
+- IO密集型，推荐 2  * N 。IO任务不总是CPU繁忙的，可以在IO等待的时候，CPU处理别的任务。
 
 
 
