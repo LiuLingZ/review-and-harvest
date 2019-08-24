@@ -124,7 +124,7 @@ JDK内置四种拒绝策略：
 ```java
 //自定义的线程池
         ExecutorService executorService = new ThreadPoolExecutor(5, 5, 0, TimeUnit.MILLISECONDS,
-                new LinkedBlockingDeque<Runnable>(10), Executors.defaultThreadFactory(),
+                new ArrayBlockingDeque<Runnable>(10), Executors.defaultThreadFactory(),
                 new RejectedExecutionHandler() {
                     @Override
                     public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
