@@ -164,7 +164,7 @@ https://www.jianshu.com/p/7e967d291c24
 
 mvcc,Multiversion Concurrency Controll,多版本并发控制。
 
-Mysql中有读锁和写锁，在没有引入MVVC之前，读锁是允许共享读，但是如果一行记录事先被上了写锁，那么就不允许其他事务进行读，现在的大部分应用都具有读多写少的特性，所以为了进一步增加并发读的性能，引入了MVVC-----Multi Version Concurrency Control（多版本并发控制）。
+Mysql中有读锁和写锁，在没有引入MVVC之前，读锁是允许共享读，但是如果**一行记录事先被上了写锁，那么就不允许其他事务进行读，**现在的大部分应用都具有读多写少的特性，所以为了进一步增加并发读的性能，引入了MVVC-----Multi Version Concurrency Control（多版本并发控制）。
 
 **解决：被加了写锁的数据在没有变化前可读。（要不要读是根据事务隔离级别判定的。）**
 

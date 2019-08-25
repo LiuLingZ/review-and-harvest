@@ -131,7 +131,7 @@ c2509ce HEAD@{21}: commit: 新增Java代码如何运行.md
 
 ### 使用^符号：只能后退
 
-​	git reset --hard HEAD^[n]
+​	git reset --hard HEAD^[n]	
 
 ​	注：一个^回退一步 ， n个^回退n步
 

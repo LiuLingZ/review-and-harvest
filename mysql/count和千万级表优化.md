@@ -14,7 +14,7 @@ count(id) : id为null的不会被统计进去
 count(1) : 有null的也会被统计。
 
 一般来说，count(*)比count(1)更高效：
-	如果count(1)是聚索引,id,那肯定是count(1)快。但是差的很小的。 因为count(*),自动会优化指定到那一个字段。所以没必要去count(1)，用count(*)，sql会帮你完成优化的 因此：count(1)和count(*)基本没有差别！ 
+	如果count(1)是聚集索引,id,那肯定是count(1)快。但是差的很小的。 因为count(*),自动会优化指定到那一个字段。所以没必要去count(1)，用count(*)，sql会帮你完成优化的 因此：count(1)和count(*)基本没有差别！ 
 
 
 count(*) 和 count(1)和count(列名)区别  
