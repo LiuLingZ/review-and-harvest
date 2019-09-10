@@ -30,7 +30,7 @@ ArrayList有其特殊的应用场景，与LinkedList相对应。其优点是随�
 https://www.cnblogs.com/zhangzongle/p/5432212.html
 
 - 底层是一个Object[] elementData 数组，和ArrayList一样，随机访问快，删除慢，需要移动元素，是并发安全的，方法都加了synchronized修饰。
-- 默认大小是10，可指定大小。每次扩容是2倍扩容
+- s默认大小是10，可指定大小。每次扩容是2倍扩容
 - 有个capacityIncrement ， 可以在初始化时指定，指定后，每次扩容都是扩 capacityIncrement 
 
 
