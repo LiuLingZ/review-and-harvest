@@ -4,7 +4,7 @@
 
 
 
-1、获取某列（col）倒数第三的人的信息
+## 1、获取某列（col）倒数第三的人的信息
 
 ```sql
 select * from table where
@@ -22,7 +22,7 @@ col =
 
 
 
-2、一些聚合函数
+## 2、一些聚合函数
 
 ```sql
 IFNULL(v1,v2); --其中：如果 v1 不为 NULL，则 IFNULL 函数返回 v1; 否则返回 v2 的结果。
@@ -38,5 +38,33 @@ count(distinct if(type =1, user_id, null)) --if的结果就是，如果type=1，
 
 
 
+```
+
+
+
+## 3、分区间显示统计时间
+
+```sql
+
+------ PS： 一定要用 group by 区间名，否则只会查出第一个数据所在的区间的总数。
+
+SELECT
+	ELT(
+		INTERVAL (cost_time,0, 100, 200, 500, 1000),
+		'100毫秒以下',
+		'100到200毫秒',
+		'200到500毫秒',
+		'500到1000毫秒',
+		'一千毫秒以上的'
+	) AS TIME,COUNT(*)
+FROM
+	ad_record_report
+WHERE
+	create_time >= '2019-10-01' AND create_time <= '2019-10-16' AND ad_slot_id = 111 GROUP BY TIME;
+	
+-----------------------------------------------------------
+SELECT
+	ELT(INTERVAL (ad_id,0,1300,1400,1500),'1300以内','1300到1400','1400到1500','1500以上') AS 区间,COUNT(*)
+FROM ad_info GROUP BY 区间
 ```
 
