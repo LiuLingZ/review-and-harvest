@@ -1,0 +1,40 @@
+@SpringBootApplication
+	@Configuration →  Spring提供
+	@ComponentScan → Spring提供
+	@EnableAutoConfiguration → SpringBoot独有
+
+@EnableAutoConfiguration：
+	能够根据类路径下的Jar动态加载和注入bean。提供我们所需的对象。
+
+application.yml \ .properties文件
+在里面配置如连接池的相关配置，在Maven中依赖一下（引入jar包），SpringBoot就会自动帮我们加载、配置、注入。而如果去掉依赖（去掉jar），就不会帮我们自动注入。
+Spring Boot本身结合了大量第三方库，可以在项目启动之初自动整合进来，其中的依赖就诸如 spring-boot-starter-jdbc，就会自动引入jdbc的内容。
+核心依赖还是：
+	spring-boot-starter-parent ; 
+	spring-boot-starter-parent之上就是spring-boot-dependencies ,最核心，管理了其控制的依赖的所有版本。
+
+而实现搜索jar并注入的功能，则是在@EnableAutoConfiguration里
+
+
+Spring本身基于IoC，在Bean管理提供极大的遍历，然，配置可XML也可Java，但是在整合第三方API时，都需要自己一步一步添加配置，项目越来越复杂，越来越大。
+@SpringBootApplication     
+@EnableAutoConfiguration     开箱即用，简化配置，
+
+spring-boot-starter-parent
+
+spring-boot-dependencies 
+
+Spring Boot的start是什么：
+	各种第三方API的自动配置启动器。
+	spring-boot-start-jdbc
+	spring-boot-start-aop
+
+取消一些自动配置Bean
+	@EnableAutoConfiguration(exclude=Bean.class)
+	@ConditionalOnBean
+
+
+spring.factories 里面添加 EnableAutoCOnfiguration
+
+Spring Boot Actuator
+	Spring Boot监视器

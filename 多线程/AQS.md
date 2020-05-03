@@ -12,7 +12,7 @@ ReentrantLock、ReentrantReadWriteLock都是基于AQS的。
 
 ##  简介
 
-​	AQS，AbstractQueuedSynchronizer 抽象队列同步器，是JUC包下众多同步类的核心实现，如ReentrantLock\Simaphone \CountdonwLatch正式底层含有一个AQS对象实现同步机制
+​	AQS，AbstractQueuedSynchronizer 抽象队列同步器，是JUC包下众多同步 类的核心实现，如ReentrantLock\Simaphone \CountdonwLatch正式底层含有一个AQS对象实现同步机制
 
 ## 核心
 
@@ -61,3 +61,97 @@ ReentrantLock、ReentrantReadWriteLock都是基于AQS的。
 ​	同步类在实现一般就是自定义一个同步器（sync）继承AQS作为内部类，供自己使用。
 
 ​	AQS底层也是主要靠CAS实现的。
+
+
+
+# 面试回答
+
+```java
+
+
+ReentrantLock 基于 AQS ， JUC下多数并发类基于AQS 。
+
+ReentrantLock 的内部类 Sync继承于抽象类AQS，实现了一些核心方法。从AQS说去
+
+AQS的核心是： volatile 修饰的 int state , 代表锁的状态，0无锁，> 0 代表锁被占用
+			FIFO的队列，队列的结点 封装的是竞争资源的线程。
+			
+AQS有两种模式：独占模式和共享模式，分别对应tryAquire和tryAquireShared
+
+ReentrantLock 就是独占的，内部实现了公平独占和非公平独占。而诸如CountDownLatch就是共享的。
+
+以ReentrantLock为例说一下lock和unlock过程
+
+lock():
+	- 首先会通过CAS尝试获取一次锁，获取成功(这是非公平的实现)，则该干嘛干嘛.
+  	- 获取失败,就通过 addWaiter方式加入到队列的尾部，这里也是通过自旋+CAS实现的。
+  	- 加入到尾部后，就开始判断这个线程是尝试获取资源还是暂时park等待了。
+  	
+  	这里涉及到一个节点的状态
+  	> 0 ，则代表线程不参与竞争，可能就是中断了，取消了
+    <= 0 ，代表线程有权利参与竞争
+    SIGNAL -1 ,如果前一个节点是，当前节点就会等待前一个节点的唤醒。刚刚说到加入队尾可能就会park等待。
+    
+    - 继续，如果加入队列的节点的前一个节点是头结点，那么他不会等待，而是不断循环尝试获取锁，tryAquire。
+    - 如果获取成功，则该该干嘛干嘛，失败不断自旋，同时判断是否需要park和中断过
+    - 如果前一个节点不是头结点，并且状态不是<=0的， 就会一直往前找，直到找到状态 <=0的，并且把前一个节
+      状态设置为SIGNAL， 然后park等待unpark .
+    - 如果中断过，就调用 Thread.interrput()中断自己，这个线程也就不参与同步资源的获取了。
+    
+    
+过程：
+CAS获取锁 → 失败入队尾 → 无限循环中，往前找到合适的前一个节点(状态<=0),设置他为SIGNAL，然后park。或者中断响应 → 如果是老二节点，就不park了(中断还是要的，即即使拿了同步资源也要中断)，而是不断循环获取资源。 → 头结点释放资源就出队列了，拿到资源的节点变为 头结点。
+    
+    
+    
+unlock():
+	底层调用tryRelease()，功能就是唤醒下一个等待的线程，可能是老二节点，如果老二因为中断什么的为空，就从尾结点开始往前找，知道找到合适的结点，unpark唤醒他。
+     
+  	
+  	
+  	
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

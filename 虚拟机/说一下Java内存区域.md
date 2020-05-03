@@ -89,9 +89,11 @@ https://www.cnblogs.com/ityouknow/p/5610232.html
 
 4、堆是线程共享的，然而堆中也可划分为多个线程私有的分配缓冲区（Thread Local Allocation Buffer,TLAB），避免一定的线程竞争，毕竟共享的东西独占需要加锁。线程私有的分配缓冲区同步问题可以由Java内存模型解决。总体来说堆是线程共享的，但是在堆的年轻代中的Eden区可以分配给专属于线程的局部缓存区TLAB，也可以用来存放对象。相当于线程私有的对象。
 
+
+
 （https://www.cnblogs.com/straybirds/p/8529924.html）
 
-
+<https://www.sohu.com/a/138637053_379840>
 
 5、堆的大小设置参数：
 

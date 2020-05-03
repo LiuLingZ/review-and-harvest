@@ -186,3 +186,44 @@ private void synchronizedInstance() {
 ### 同步代码块	
 
 ​	同步代码块则是通过 monitorenter 和 monitorexit 包围同步程序，同一时间只能有一个线程获取到同步资源并进入同步代码块。
+
+
+
+
+
+
+
+## 四、Synchronized和ReentrantLock区别
+
+
+
+![1585382475008](C:\Users\lingz\AppData\Roaming\Typora\typora-user-images\1585382475008.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -45,6 +45,22 @@
 - 这样每次堆顶都是k个中最小的，而到最后，剩余的堆中的k个则是N个中最大的。有点像肉弱强食，总是把K中的最弱者替	换掉。
 ```
 
+**注：PrioirtyQueue天生就实现了小顶堆！**
+
+![1576979255750](C:\Users\lingz\AppData\Roaming\Typora\typora-user-images\1576979255750.png)
+
+**而要通过PriorityQueue实现大顶堆，就需要：**
+
+```java
+Queue<Integer> queue = new PriorityQueue<>(Comparator.reverseOrder());
+```
+
+
+
+
+
+
+
 ### 3、复杂度
 
 ​	堆排序 O（NlogN）

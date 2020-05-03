@@ -58,6 +58,10 @@ h:　　一个InvocationHandler对象，表示的是当我这个动态代理对�
 
 
 
+一个代理对象和一个InvocationHandler对象关联，代理对象调用被代理对象的方法的时候，就会交给这个handler对象负责， 其invoke方法就是核心的代理方法。
+
+
+
 
 
 ## 二、Cglib实现动态代理

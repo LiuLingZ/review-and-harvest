@@ -6,7 +6,11 @@ http://www.cnblogs.com/dolphin0520/p/3932921.html
 
 Java高并发程序设计
 
+<https://cloud.tencent.com/developer/article/1585842>
 
+<https://www.jianshu.com/p/a5a21d48678a>
+
+重点  ：https://www.jianshu.com/p/9a8c81066201>
 
 # 线程池
 
@@ -57,8 +61,14 @@ public ThreadPoolExecutor(
     	RejectedExecutionHandler handler //拒绝策略
 )
     
-//记录任务数量
+//低28位记录线程总数 ， 高3位记录线程状态。好处时直接通过比较大小判断 状态、当前线程数
 private final AtomicInteger ctl = new AtomicInteger(ctlOf(RUNNING, 0));
+
+
+//Worker内部类
+worker 继承了 AQS 、实现 Runnable接口，并且内部含有一个Thread字段
+所以Worker才是真的线程池中的线程，即创建一个线程时 : new Worker(Runnable firstTask) ；
+其构造方法： this.thread = firstTask ；
 ```
 
 
@@ -152,6 +162,15 @@ private static final int SHUTDOWN = 0 << COUNT_BITS;
 private static final int STOP = 1 << COUNT_BITS;
 private static final int TIDYING = 2 << COUNT_BITS;
 private static final int TERMINATED = 3 << COUNT_BITS;
+
+//ctl 前三位存储状态，与~Capacity相与得到 ； 后29位存储worker数量 ， 数量直接与 capacity相与
+// capacity : 000 11111111111111111111111111111 (32位)
+// ~capacity: 111 00000000000000000000000000000 (32位)
+// COUNT_BITS = 29
+// STOP = 1 << 29 =  00100000000000000000000000000000 （32位）
+// 一般worker数量类似如： 000 0000000000000000000000110100 这样，与 capacity相与即可
+所以相与即可。
+
 
 1、RUNNING
 	线程池被创建，就处于RUNNING状态，可以接受新的任务，此时线程数量 ctl 为 0；

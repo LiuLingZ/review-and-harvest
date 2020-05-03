@@ -73,7 +73,9 @@ volatile变量规则
 
 ​	都是Object的方法，必须在 synchronizd 中运行。作用是 等待、唤醒在某个资源上的线程。
 
+[为什么wait，notify，notifyAll这些方法不在thread类里面？](https://www.cnblogs.com/pzyin/p/11414077.html)
 
+​	Java提供的锁是对象级的而不是线程级的，每个对象都有锁，通过线程获得。简单的说，由于wait，notify，notifyAll都是锁级别的操作，所以把他们定义在object类中因为锁属于对象。
 
 #### suspend() 和 resume()
 
@@ -178,7 +180,7 @@ suspend被弃用的原因是因为它会造成死锁。suspend方法和stop方�
 
 ```
 - 作用是让一定数量的线程都完成后才能接下去的操作，如同火箭发射，需要多个检查都完成后，才能发射
-- CountDownLatch 调用 await() ，即可开始等待定义的线程数完成。 
+- CountDownLatch调用 await() ，即可开始等待定义的线程数完成。 
 - 例子 P87
 ```
 

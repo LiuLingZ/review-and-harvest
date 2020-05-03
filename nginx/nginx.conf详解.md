@@ -160,9 +160,20 @@ http {
 
     
     include /etc/nginx/conf.d/*.conf;
+    
+    upstream lingz.com{
+    	ip_hash;
+    	server 192.168.8.11:80;
+    	server 192.168.8.12:80 down;
+	    server 192.168.8.146:8080;
+	}
 
 	-- 包含 server {}
-	server { ... }
+	server { 
+    	location / {
+    		proxy_pass http://lingz.com
+    	}
+    }
 }
 
 ```

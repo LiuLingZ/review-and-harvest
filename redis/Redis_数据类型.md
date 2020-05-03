@@ -59,9 +59,15 @@
 要点：
 - 类似Java的ArrayList,由一个个字节组成，一个字节占8 bit 。
 - 动态变更长度，可扩容。＜1M，则每次 * 2 ； ≥ 1M，每次扩容 +1M。
+
+
+△
+-底层是SDS结构，simple dynamic string , 和arraylist差不多，是基于数组，预先设定容量。
+-通过debug object 键名 可以发现，SDS有两种结构 ： emb 和 raw 形式。【看encoding属性】
+-小字符串（44字节内）是emb， 大于则是raw形式。
+
+
 ```
-
-
 
 #### list（列表）
 
