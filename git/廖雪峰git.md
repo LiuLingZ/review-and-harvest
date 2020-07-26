@@ -1,6 +1,12 @@
+
+
+![img](https://mmbiz.qpic.cn/mmbiz/eQPyBffYbufTCibib86U9CCeu7ibdH4FyIsH10EpW9P88HfHYRVab9HxJjpmXpS2RqI0wNIiaibCOsZUWPrc3bfHs5w/640?wx_fmt=other&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
+
+
 1、全局配置
 
-```git
+```shell
 git config --global user.name 'leikes'
 git config --global user.email xxx@qq.com
 ```
@@ -13,9 +19,13 @@ git config --global user.email xxx@qq.com
 
 3、提交文档到仓库
 
-```
+```shell
 git add a.txt     //把文件添加到仓库中
 git commit -m '提交了a.txt'   //将要添加到仓库的文件提交到仓库中
+
+git remote add origin https://github.com/name/name_cangku.git #把本地仓库与远程仓库连接起来
+
+git push -u origin master # 把仓库区的文件提交到远程仓库里
 ```
 
 4、比较不同
@@ -23,7 +33,7 @@ git commit -m '提交了a.txt'   //将要添加到仓库的文件提交到仓库
 ```sql
 git diff 文件名
 
--- 想要比较不同，这个文件必须已经 git commit 过，才有记录可与之匹配。
+-- 想要比较不同，这个文件必须已经 git commit 过，才有记录可与之匹配。	
 --eg: 
 git add a.txt ;
 git commit a.txt ;
@@ -67,7 +77,7 @@ git reset HEAD^
 
 git reflog  //查看所有操作，找到刚刚最新的序列号
 
-git reset 序列号  //完成谎还原
+git reset 序列号  //完成还原
 
 
 ```
@@ -117,6 +127,12 @@ git reset HEAD^
 1、**本地**分支的创建、开发、合并、删除
 
 ```java
+//查看本地有多少分支
+git branch
+
+//查看远程有多少分支
+git branch --remote
+
 //创建分支
 git branch dev
 //切换分支
@@ -134,7 +150,7 @@ git checkout -b dev
 //现在切回到master合并分支
 git checkout master
 
-//在master合并dev
+//在master合并dev （当前在master，合并之后是直接提交到仓库的，只有冲突的文件会出现在工作区）, 
 git merge dev
 
 //此时如果发生冲突，可以找到冲突文件，修改之后
@@ -153,6 +169,27 @@ git log --graph --pretty=oneline --abbrev-commit
 
 
 ```
+
+
+
+### 2、远程分支创建与删除
+
+```shell
+# 创建远程分支需要本地提交到远程上
+
+# 创建+切换到新的本地分支
+git checkout -b dev
+
+# 将分支推到github
+git push origin dev
+
+# 删除远程分支 【分支名前的冒号代表删除】。
+git push origin :[branch name]
+
+
+```
+
+
 
 
 
@@ -219,6 +256,9 @@ git branch -D 分支名
 7、提交 到远程库
 
 ```java
+//创建远程仓库的链接
+git remote add origin git地址
+
 //提交到远程dev分支
 git push origin dev
 
@@ -332,7 +372,7 @@ git clone https://github.com/LiuLingZ/review-and-harvest.git
 
 
 
-## 3、多人协作开发
+### 3、多人协作开发
 
 ```java
 //1、首先需要和项目创建连接
